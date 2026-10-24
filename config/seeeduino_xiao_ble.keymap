@@ -17,6 +17,18 @@
             #binding-cells = <0>;
             bindings = <&bt BT_CLR>;
         };
+
+        msc_up_m: msc_up_macro {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&msc SCRL_UP>;
+        };
+
+    msc_dn_m: msc_dn_macro {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&msc SCRL_DOWN>;
+        };
     };
 
     behaviors {
@@ -42,7 +54,7 @@
         scroll_v: sensor_scroll_v {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc SCRL_DOWN>, <&msc SCRL_UP>;
+            bindings = <&msc_dn_m>, <&msc_up_m>;
             tap-ms = <50>;  // ←これを必ず入れます
         };
     
