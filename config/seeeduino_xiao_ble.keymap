@@ -38,18 +38,18 @@
             bindings = <&bt_clr_m>, <&bt_nxt_m>;
         };
 
-        rot_msc_v: sensor_rotate_msc_v {
-            compatible = "zmk,behavior-sensor-rotate-var";
-            #sensor-binding-cells = <2>;
-            bindings = <&msc>, <&msc>;
-            tap-ms = <20>;
+        // 縦スクロール用の固定動作（tap-msは外す）
+        scroll_v: sensor_scroll_v {
+            compatible = "zmk,behavior-sensor-rotate";
+            #sensor-binding-cells = <0>;
+            bindings = <&msc SCRL_DOWN>, <&msc SCRL_UP>;
         };
-
-        rot_msc_h: sensor_rotate_msc_h {
-            compatible = "zmk,behavior-sensor-rotate-var";
-            #sensor-binding-cells = <2>;
-            bindings = <&msc>, <&msc>;
-            tap-ms = <20>;
+    
+        // 横スクロール用の固定動作
+        scroll_h: sensor_scroll_h {
+            compatible = "zmk,behavior-sensor-rotate";
+            #sensor-binding-cells = <0>;
+            bindings = <&msc SCRL_RIGHT>, <&msc SCRL_LEFT>;
         };
     };
 
@@ -64,7 +64,8 @@
                 &lt_mkp 1 MB4
                 &bt_mode 0 0    // 短押し: プロファイル切替, 長押し(2.0秒): ペアリング解除
             >;
-            sensor-bindings = <&inc_dec_kp UP DOWN>;
+            // 縦スクロールを割り当て
+            sensor-bindings = <&scroll_v>;
         };
 
         scroll_layer {
@@ -75,7 +76,8 @@
                 &trans
                 &trans
             >;
-            sensor-bindings = <&rot_msc_h SCRL_RIGHT SCRL_LEFT>;
+            // 横スクロールを割り当て
+            sensor-bindings = <&scroll_h>;
         };
     };
 };
