@@ -64,7 +64,7 @@
                 &lt_mkp 1 MB4
                 &bt_mode 0 0    // 短押し: プロファイル切替, 長押し(2.0秒): ペアリング解除
             >;
-            sensor-bindings = <&rot_msc_v SCRL_DOWN SCRL_UP>;
+            sensor-bindings = <&inc_dec_kp UP DOWN>;
         };
 
         scroll_layer {
