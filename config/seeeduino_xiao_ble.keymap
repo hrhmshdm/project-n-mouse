@@ -1,9 +1,10 @@
+//（スクロール1回あたりの移動量を80に設定）
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 80
+
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/pointing.h>
-//（スクロール1回あたりの移動量を80に設定）
-#define ZMK_POINTING_DEFAULT_SCRL_VAL 80
 
 / {
     // Bluetoothコマンドを直接呼び出すとエラーになるため、マクロで包む
