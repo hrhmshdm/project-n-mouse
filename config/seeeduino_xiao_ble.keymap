@@ -9,8 +9,8 @@
 // スクロールの滑らかさ（立ち上がり・加速）の調整
 &msc {
     time-to-max-speed-ms = <250>; // 0.25秒間連続で回すと最高速（通常の数倍）に到達
-    acceleration-exponent = ;  // 2: 二次関数加速（ゆっくりなら等倍、速く回すと急加速）
-    delay-ms = ;
+    acceleration-exponent = <2>;  // 2: 二次関数加速（ゆっくりなら等倍、速く回すと急加速）
+    delay-ms = <0>;
 };
 
 / {
