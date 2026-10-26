@@ -5,7 +5,7 @@ manifest:
     - name: hrhmshdm  # <-- badjeff から自分のユーザー名に変更
       url-base: https://github.com/hrhmshdm  # <-- URLも自分のものに変更
     - name: amgskobo
-    url-base: https://github.com/amgskobo
+      url-base: https://github.com/amgskobo
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -15,7 +15,7 @@ manifest:
       remote: hrhmshdm  # <-- 参照先も自分の名前に変更
       revision: bffa61761dc1fb87d8bc04133c55a10bc899a359 # <-- mainの代わりに、確実なバージョンを固定
     - name: zmk-input-inertia
-    remote: amgskobo
-    revision: main
+      remote: amgskobo
+      revision: main
   self:
     path: config
