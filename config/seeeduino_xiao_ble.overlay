@@ -1,5 +1,6 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <input/processors.dtsi> // ★追加：Input Processor（スクロール変換・感度調整）を使うためのヘッダ
 
 / {
     chosen {
@@ -38,6 +39,13 @@
     paw3395_listener {
         compatible = "zmk,input-listener";
         device = <&pd0>;
+
+        /* ★追加：レイヤー2（サイド＋右クリック中）のときだけマウス移動を無段階スクロールに変換 */
+        drag_scroll {
+            layers = <2>;
+            /* 1000 CPIのままだとスクロールが速すぎるため、1/16に減速してからスクロール変換 */
+            input-processors = <&zip_xy_scaler 1 16>, <&zip_xy_to_scroll_mapper>;
+        };
     };
 };
 
@@ -70,7 +78,7 @@
         x-input-code = <INPUT_REL_X>;
         y-input-code = <INPUT_REL_Y>;
 
-        /* 基板の向きに合わせて後からカーソル方向を調整するオプション（必要時にコメント解除） */
+        /* 基板の向きに合わせて後からカーソル方向を調整するオプション */
         // swap-xy;
         invert-x;
         // invert-y;
