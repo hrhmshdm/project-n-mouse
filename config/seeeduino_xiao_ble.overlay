@@ -2,11 +2,6 @@
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 #include <input/processors.dtsi>
 
-/* ★ZMK v0.3標準機能：ホイール(&msc)のスクロール量を直接 8倍 に増幅する */
-&msc_input_listener {
-    input-processors = <&zip_scroll_scaler 8 1>;
-};
-
 / {
     chosen {
         zmk,kscan = &kscan0;
