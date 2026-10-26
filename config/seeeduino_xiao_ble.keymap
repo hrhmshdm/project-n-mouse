@@ -1,20 +1,19 @@
-// 80 → 300 に変更（短い時間でもWindowsが1ノッチとしてしっかり反応する強さ）
-#define ZMK_POINTING_DEFAULT_SCRL_VAL 300
+// 基本移動量を120に設定（overlay側の3倍スケーラーで実質360相当の勢いになります）
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 120
 
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/pointing.h>
 
-// スクロールの滑らかさ（立ち上がり・加速）の調整
+// ★重要：立ち上がりの遅延（スロースタート）をゼロにし、1ノッチ目から最高速を出す
 &msc {
-    time-to-max-speed-ms = <250>; // 0.25秒間連続で回すと最高速（通常の数倍）に到達
-    acceleration-exponent = <2>;  // 2: 二次関数加速（ゆっくりなら等倍、速く回すと急加速）
+    time-to-max-speed-ms = <0>;
+    acceleration-exponent = <0>;
     delay-ms = <0>;
 };
 
 / {
-    // Bluetoothコマンドを直接呼び出すとエラーになるため、マクロで包む
     macros {
         bt_nxt_m: bt_nxt_macro {
             compatible = "zmk,behavior-macro";
@@ -30,7 +29,6 @@
     };
 
     behaviors {
-        // マウスボタンとレイヤー切り替えの併用（SW4用）
         lt_mkp: layer_tap_mouse_kp {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
@@ -39,61 +37,56 @@
             bindings = <&mo>, <&mkp>;
         };
 
-        // BLEプロファイル切り替え用：短押しで次へ(NXT)、長押しで削除(CLR)
         bt_mode: bt_mode_hold_tap {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
-            flavor = "hold-preferred"; /* 長押しを優先して確実に判定 */
-            tapping-term-ms = <2000>;  /* 2.0秒長押しでペアリング解除 */
+            flavor = "hold-preferred";
+            tapping-term-ms = <2000>;
             bindings = <&bt_clr_m>, <&bt_nxt_m>;
         };
 
-        // 縦スクロール用（方向を逆にし、tap-msを80msに延長）
+        // 縦スクロール（30msの間しっかり信号を出して慣性モジュールを起動させる）
         scroll_v: sensor_scroll_v {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
             bindings = <&msc SCRL_UP>, <&msc SCRL_DOWN>;
-            tap-ms = <30>; // ★80ms → 30ms に変更（キレの良さと連続回転時の加速繋がりを両立）
+            tap-ms = <30>;
         };
 
-        // 横スクロール用（80msに延長）
+        // 横スクロール
         scroll_h: sensor_scroll_h {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
             bindings = <&msc SCRL_RIGHT>, <&msc SCRL_LEFT>;
-            tap-ms = <30>; // ★80ms → 30ms に変更（キレの良さと連続回転時の加速繋がりを両立）
+            tap-ms = <30>;
         };
     };
 
     keymap {
         compatible = "zmk,keymap";
 
-        // レイヤー0：通常モード
         default_layer {
             bindings = <
-                &mkp LCLK       // SW1: 左クリック
-                &mkp RCLK       // SW2: 右クリック
-                &mkp MCLK       // SW3: 中クリック
-                &lt_mkp 1 MB4   // SW4: 単押しで「戻る(MB4)」、長押しでレイヤー1へ
-                &bt_mode 0 0    // SW5: 短押しでプロファイル切替、2秒長押しでペアリング解除
+                &mkp LCLK
+                &mkp RCLK
+                &mkp MCLK
+                &lt_mkp 1 MB4
+                &bt_mode 0 0
             >;
             sensor-bindings = <&scroll_v>;
         };
 
-        // レイヤー1：サイドボタン（SW4）を押している間のモード
         scroll_layer {
             bindings = <
-                &mkp MB5        // サイド＋左クリック：進む(MB5)
-                &mo 2           // サイド＋右クリック：押している間、超高速・無段階スクロール(レイヤー2)
-                &kp LG(TAB)     // サイド＋中クリック：Win + Tab（タスクビュー）
-                &trans          // サイドボタン自身
-                &trans          // モードボタン
+                &mkp MB5
+                &mo 2
+                &kp LG(TAB)
+                &trans
+                &trans
             >;
-            // サイドボタンを押しながらホイールを回すと横スクロール
             sensor-bindings = <&scroll_h>;
         };
 
-        // レイヤー2：超高速・無段階スクロール発動中（サイド＋右クリックホールド中）
         drag_scroll_layer {
             bindings = <
                 &trans
