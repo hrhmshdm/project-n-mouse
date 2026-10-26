@@ -3,10 +3,10 @@
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/pointing.h>
 
-// ホイールを連続で回したときにグッと加速させる設定
+// スクロールの加速設定（初速から100%のスピードを出し、連続回転でさらに加速させる）
 &msc {
-    time-to-max-speed-ms = <80>;  // 0.08秒で最高速に到達（素早く弾いた時だけ一気に加速）
-    acceleration-exponent = <2>;  // 2乗カーブで急加速させる
+    time-to-max-speed-ms = <50>;
+    acceleration-exponent = <1>;
     delay-ms = <0>;
 };
 
@@ -42,120 +42,20 @@
             bindings = <&bt_clr_m>, <&bt_nxt_m>;
         };
 
-        // 縦スクロール：MOVE_Yで直接60を指定し、tap-ms=120msで擬似慣性（余韻）と連続加速を作る
+        // 縦スクロール：MOVE_Yで直接 300（初期値10の30倍）を指定し、tap-ms=100msで滑らかな余韻を作る
         scroll_v: sensor_scroll_v {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_Y(60)>, <&msc MOVE_Y(-60)>;
-            tap-ms = <120>;
+            bindings = <&msc MOVE_Y(300)>, <&msc MOVE_Y(-300)>;
+            tap-ms = <100>;
         };
 
-        // 横スクロール：MOVE_Xで直接60を指定
+        // 横スクロール：MOVE_Xで直接 300 を指定
         scroll_h: sensor_scroll_h {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_X(60)>, <&msc MOVE_X(-60)>;
-            tap-ms = <120>;
-        };
-    };
-
-    keymap {
-        compatible = "zmk,keymap";
-
-        default_layer {
-            bindings = <
-                &mkp LCLK
-                &mkp RCLK
-                &mkp MCLK
-                &lt_mkp 1 MB4
-                &bt_mode 0 0
-            >;
-            sensor-bindings = <&scroll_v>;
-        };
-
-        scroll_layer {
-            bindings = <
-                &mkp MB5
-                &mo 2
-                &kp LG(TAB)
-                &trans
-                &trans
-            >;
-            sensor-bindings = <&scroll_h>;
-        };
-
-        drag_scroll_layer {
-            bindings = <
-                &trans
-                &trans
-                &trans
-                &trans
-                &trans
-            >;
-            sensor-bindings = <&scroll_v>;
-        };
-    };
-};// 基本移動量を120に設定（overlay側の3倍スケーラーで実質360相当の勢いになります）
-#define ZMK_POINTING_DEFAULT_SCRL_VAL 120
-
-#include <behaviors.dtsi>
-#include <dt-bindings/zmk/keys.h>
-#include <dt-bindings/zmk/bt.h>
-#include <dt-bindings/zmk/pointing.h>
-
-// ★重要：立ち上がりの遅延（スロースタート）をゼロにし、1ノッチ目から最高速を出す
-&msc {
-    time-to-max-speed-ms = <0>;
-    acceleration-exponent = <0>;
-    delay-ms = <0>;
-};
-
-/ {
-    macros {
-        bt_nxt_m: bt_nxt_macro {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&bt BT_NXT>;
-        };
-
-        bt_clr_m: bt_clr_macro {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&bt BT_CLR>;
-        };
-    };
-
-    behaviors {
-        lt_mkp: layer_tap_mouse_kp {
-            compatible = "zmk,behavior-hold-tap";
-            #binding-cells = <2>;
-            flavor = "tap-preferred";
-            tapping-term-ms = <200>;
-            bindings = <&mo>, <&mkp>;
-        };
-
-        bt_mode: bt_mode_hold_tap {
-            compatible = "zmk,behavior-hold-tap";
-            #binding-cells = <2>;
-            flavor = "hold-preferred";
-            tapping-term-ms = <2000>;
-            bindings = <&bt_clr_m>, <&bt_nxt_m>;
-        };
-
-        // 縦スクロール（30msの間しっかり信号を出して慣性モジュールを起動させる）
-        scroll_v: sensor_scroll_v {
-            compatible = "zmk,behavior-sensor-rotate";
-            #sensor-binding-cells = <0>;
-            bindings = <&msc SCRL_UP>, <&msc SCRL_DOWN>;
-            tap-ms = <30>;
-        };
-
-        // 横スクロール
-        scroll_h: sensor_scroll_h {
-            compatible = "zmk,behavior-sensor-rotate";
-            #sensor-binding-cells = <0>;
-            bindings = <&msc SCRL_RIGHT>, <&msc SCRL_LEFT>;
-            tap-ms = <30>;
+            bindings = <&msc MOVE_X(300)>, <&msc MOVE_X(-300)>;
+            tap-ms = <100>;
         };
     };
 
