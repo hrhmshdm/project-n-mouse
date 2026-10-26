@@ -1,5 +1,5 @@
-//（スクロール1回あたりの移動量を80に設定 ※必ず pointing.h より上に記述）
-#define ZMK_POINTING_DEFAULT_SCRL_VAL 80
+// 80 → 300 に変更（短い時間でもWindowsが1ノッチとしてしっかり反応する強さ）
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 300
 
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
@@ -8,9 +8,9 @@
 
 // スクロールの滑らかさ（立ち上がり・加速）の調整
 &msc {
-    time-to-max-speed-ms = <150>; // 150msかけて滑らかに最高速へ到達させる（スムーズ感の演出）
-    acceleration-exponent = <1>;  // 1:自然な線形加速（素早く回した時だけ連続加速する）
-    delay-ms = <0>;               // 遅延なしで即座に反応させる
+    time-to-max-speed-ms = <250>; // 0.25秒間連続で回すと最高速（通常の数倍）に到達
+    acceleration-exponent = ;  // 2: 二次関数加速（ゆっくりなら等倍、速く回すと急加速）
+    delay-ms = ;
 };
 
 / {
@@ -53,7 +53,7 @@
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
             bindings = <&msc SCRL_UP>, <&msc SCRL_DOWN>;
-            tap-ms = <80>;
+            tap-ms = <30>; // ★80ms → 30ms に変更（キレの良さと連続回転時の加速繋がりを両立）
         };
 
         // 横スクロール用（80msに延長）
@@ -61,7 +61,7 @@
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
             bindings = <&msc SCRL_RIGHT>, <&msc SCRL_LEFT>;
-            tap-ms = <80>;
+            tap-ms = <30>; // ★80ms → 30ms に変更（キレの良さと連続回転時の加速繋がりを両立）
         };
     };
 
