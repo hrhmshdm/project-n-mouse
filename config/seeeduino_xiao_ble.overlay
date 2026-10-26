@@ -1,21 +1,10 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 #include <input/processors.dtsi>
-#include <zmk-input-inertia/input/processors.dtsi> // ★追加：慣性モジュールの読み込み
 
-/* ★追加：慣性（イナーシャ）の挙動設定 */
-&zip_inertia {
-    trigger-ms = <40>;                  // 入力停止から慣性が始まるまでの待機時間(ms)
-    scroll-decay-factor-int = <88>;     // 慣性の残りやすさ（0〜99%：85〜92が大きいほど長く回る）
-    scroll-report-interval-ms = <25>;   // 慣性スクロールの更新間隔（小さいほど滑らか）
-    scroll-threshold-start = <2>;       // 慣性が発動する最小の勢い（ゆっくり回した時は発動しない）
-    scroll-threshold-stop = <0>;        // 停止判定のしきい値
-    cancel-scroll-inertia-on-ctrl;      // Ctrlキー押下時は勝手に拡大縮小されないよう慣性を即停止
-};
-
-/* ★追加：物理ホイール（&msc）の出力を3倍に増幅し、慣性をかける */
+/* ★ZMK v0.3標準機能：ホイール(&msc)のスクロール量を直接 8倍 に増幅する */
 &msc_input_listener {
-    input-processors = <&zip_scroll_scaler 3 1>, <&zip_inertia>;
+    input-processors = <&zip_scroll_scaler 8 1>;
 };
 
 / {
@@ -23,6 +12,7 @@
         zmk,kscan = &kscan0;
     };
 
+    /* 5つのボタン設定 (D0〜D4) */
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-direct";
         wakeup-source;
@@ -35,6 +25,7 @@
             ;
     };
 
+    /* ロータリーエンコーダ設定 (D5, D6) */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
         a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
@@ -53,10 +44,10 @@
         compatible = "zmk,input-listener";
         device = <&pd0>;
 
-        /* レイヤー2（サイド＋右クリック）：マウス移動での無段階スクロールにも慣性を適用 */
+        /* レイヤー2（サイド＋右クリック）：マウス移動での超高速・無段階スクロール */
         drag_scroll {
             layers = <2>;
-            input-processors = <&zip_xy_scaler 1 6>, <&zip_xy_to_scroll_mapper>, <&zip_inertia>;
+            input-processors = <&zip_xy_scaler 1 6>, <&zip_xy_to_scroll_mapper>;
         };
     };
 };
