@@ -4,6 +4,13 @@
 #include <dt-bindings/zmk/input_transform.h>
 
 / {
+    /* ★追加：XIAO内蔵の3色LED（led0〜2）を zmk-rgbled-widget 用の名前に紐付ける */
+    aliases {
+        led-red = &led0;
+        led-green = &led1;
+        led-blue = &led2;
+    };
+
     chosen {
         zmk,kscan = &kscan0;
     };
