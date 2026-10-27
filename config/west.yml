@@ -2,15 +2,20 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
-    - name: hrhmshdm  # <-- badjeff から自分のユーザー名に変更
-      url-base: https://github.com/hrhmshdm  # <-- URLも自分のものに変更
+    - name: hrhmshdm
+      url-base: https://github.com/hrhmshdm
+    - name: caksoylar
+      url-base: https://github.com/caksoylar
   projects:
     - name: zmk
       remote: zmkfirmware
       revision: v0.3
       import: app/west.yml
     - name: zmk-paw3395-driver
-      remote: hrhmshdm  # <-- 参照先も自分の名前に変更
-      revision: bffa61761dc1fb87d8bc04133c55a10bc899a359 # <-- mainの代わりに、確実なバージョンを固定
+      remote: hrhmshdm
+      revision: bffa61761dc1fb87d8bc04133c55a10bc899a359
+    - name: zmk-rgbled-widget
+      remote: caksoylar
+      revision: main
   self:
     path: config
