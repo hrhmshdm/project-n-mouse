@@ -1,6 +1,7 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 #include <input/processors.dtsi>
+#include <dt-bindings/zmk/input_transform.h>
 
 / {
     chosen {
@@ -20,7 +21,7 @@
             ;
     };
 
-    /* ★修正：stepsとtriggersを両方24に揃え、1ノッチ目から100%反応させる */
+    /* ロータリーエンコーダ設定 (D5, D6) */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
         a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
@@ -32,23 +33,25 @@
     sensors: sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&left_encoder>;
-        triggers-per-rotation = <24>; /* ★12から24に変更（2〜3パルス空振りする原因を解消） */
+        triggers-per-rotation = <24>;
     };
 
     paw3395_listener {
         compatible = "zmk,input-listener";
         device = <&pd0>;
 
-        /* ★レイヤー1（サイドボタン長押し中）：遅い・精密な無段階スクロール (1/16倍) */
-        drag_scroll_slow {
-            layers = <1>;
-            input-processors = <&zip_xy_scaler 1 16>, <&zip_xy_to_scroll_mapper>;
-        };
+        /* レイヤー1（サイド長押し）の低速スクロールは廃止（通常のカーソル移動として動作） */
 
-        /* ★レイヤー2（サイド＋右クリック中）：超高速の無段階スクロール (1/3倍) */
+        /* レイヤー2（サイド＋右クリック中）：超高速の自由スクロール */
         drag_scroll_fast {
             layers = <2>;
-            input-processors = <&zip_xy_scaler 1 3>, <&zip_xy_to_scroll_mapper>;
+            /*
+             * 1. &zip_xy_scaler 1 1 : 減速なしの等倍（従来の1/3から3倍に加速）
+             *    ※もしもっと速くしたい場合は <2 1>、少し抑えたい場合は <1 2> に変更
+             * 2. &zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT) : 横・縦の方向を逆転
+             *    ※もし「横だけ逆にして縦は元のまま」にしたい場合は (INPUT_TRANSFORM_X_INVERT) のみに変更してください
+             */
+            input-processors = <&zip_xy_scaler 2 1>, <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT)>, <&zip_xy_to_scroll_mapper>;
         };
     };
 };
