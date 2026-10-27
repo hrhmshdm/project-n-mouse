@@ -12,15 +12,15 @@
         compatible = "zmk,kscan-gpio-direct";
         wakeup-source;
         input-gpios
-            = <&xiao_d 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
-            , <&xiao_d 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
-            , <&xiao_d 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
-            , <&xiao_d 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
-            , <&xiao_d 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            = <&xiao_d 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW1: 左クリック */
+            , <&xiao_d 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW2: 右クリック */
+            , <&xiao_d 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW3: 中クリック */
+            , <&xiao_d 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW4: サイドボタン */
+            , <&xiao_d 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW5: モードボタン */
             ;
     };
 
-    /* ロータリーエンコーダ設定 (D5, D6) */
+    /* ★修正：stepsとtriggersを両方24に揃え、1ノッチ目から100%反応させる */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
         a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
@@ -32,17 +32,23 @@
     sensors: sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&left_encoder>;
-        triggers-per-rotation = <12>;
+        triggers-per-rotation = <24>; /* ★12から24に変更（2〜3パルス空振りする原因を解消） */
     };
 
     paw3395_listener {
         compatible = "zmk,input-listener";
         device = <&pd0>;
 
-        /* レイヤー2（サイド＋右クリック）：マウス移動での超高速・無段階スクロール */
-        drag_scroll {
+        /* ★レイヤー1（サイドボタン長押し中）：遅い・精密な無段階スクロール (1/16倍) */
+        drag_scroll_slow {
+            layers = <1>;
+            input-processors = <&zip_xy_scaler 1 16>, <&zip_xy_to_scroll_mapper>;
+        };
+
+        /* ★レイヤー2（サイド＋右クリック中）：超高速の無段階スクロール (1/3倍) */
+        drag_scroll_fast {
             layers = <2>;
-            input-processors = <&zip_xy_scaler 1 6>, <&zip_xy_to_scroll_mapper>;
+            input-processors = <&zip_xy_scaler 1 3>, <&zip_xy_to_scroll_mapper>;
         };
     };
 };
