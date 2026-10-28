@@ -28,25 +28,19 @@
             ;
     };
 
-    /* TTC グリーンコア エンコーダ設定 */
+    /* TTC グリーンコア エンコーダ設定 (24/24直結) */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
         a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&xiao_d 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <24>; /* ★間引きによる不発を防ぐため24に統一 */
+        steps = <24>;
         status = "okay";
     };
 
     sensors: sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&left_encoder>;
-        triggers-per-rotation = <24>; /* ★stepsと同じ24にして1対1で即発火させる */
-    };
-
-    sensors: sensors {
-        compatible = "zmk,keymap-sensors";
-        sensors = <&left_encoder>;
-        triggers-per-rotation = <24>; /* 1周24クリック（2エッジ完結で1回発火） */
+        triggers-per-rotation = <24>;
     };
 
     paw3395_listener {
