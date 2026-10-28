@@ -28,13 +28,19 @@
             ;
     };
 
-    /* TTC グリーンコア エンコーダ設定 (1周24クリック / 12パルス=48ステップ) */
+    /* TTC グリーンコア エンコーダ設定 */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
         a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&xiao_d 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <48>; /* 1周48エッジ（TTC 12パルス仕様） */
+        steps = <24>; /* ★間引きによる不発を防ぐため24に統一 */
         status = "okay";
+    };
+
+    sensors: sensors {
+        compatible = "zmk,keymap-sensors";
+        sensors = <&left_encoder>;
+        triggers-per-rotation = <24>; /* ★stepsと同じ24にして1対1で即発火させる */
     };
 
     sensors: sensors {
