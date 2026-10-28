@@ -28,19 +28,19 @@
             ;
     };
 
-    /* ロータリーエンコーダ設定 (D5, D6) */
+   /* TTC グリーンコア エンコーダ設定 (1周24クリック / 12パルス=48ステップ) */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
-        a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        b-gpios = <&xiao_d 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <24>;
+        a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP | GPIO_DEBOUNCE)>;
+        b-gpios = <&xiao_d 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP | GPIO_DEBOUNCE)>;
+        steps = <48>; /* ★1周48エッジ（TTC 12パルス仕様の正確な値） */
         status = "okay";
     };
 
     sensors: sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&left_encoder>;
-        triggers-per-rotation = <24>;
+        triggers-per-rotation = <24>; /* ★1周24クリック（48÷24＝2エッジ完結で1回発火） */
     };
 
     paw3395_listener {
