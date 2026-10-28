@@ -28,29 +28,37 @@
             ;
     };
 
-    /* TTC グリーンコア エンコーダ設定 (24/24直結) */
+    /* TTC グリーンコア エンコーダ設定 (図面仕様: 12パルス / 24デテント) */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
         a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&xiao_d 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <24>;
+        steps = <12>; /* ★12パルス指定（24デテントとの組み合わせで1ノッチ＝1発火に一致） */
         status = "okay";
     };
 
     sensors: sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&left_encoder>;
-        triggers-per-rotation = <24>;
+        triggers-per-rotation = <24>; /* ★24デテント指定 */
+    };
+
+    /* 横方向の動きを無視して「上下スクロールのみ」に変換するカスタムマッパー */
+    zip_y_only_scroll_mapper: zip_y_only_scroll_mapper {
+        compatible = "zmk,input-processor-code-mapper";
+        #input-processor-cells = <0>;
+        type = <INPUT_EV_REL>;
+        map = <INPUT_REL_Y INPUT_REL_WHEEL>; /* Y軸（上下）だけをホイール回転に変換し、X軸は無視 */
     };
 
     paw3395_listener {
         compatible = "zmk,input-listener";
         device = <&pd0>;
 
-        /* レイヤー2（サイド＋右クリック中）：超高速の自由スクロール */
+        /* レイヤー2（サイド＋右クリック中）：上下方向のみに限定した超高速スクロール */
         drag_scroll_fast {
             layers = <2>;
-            input-processors = <&zip_xy_scaler 1 1>, <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>, <&zip_xy_to_scroll_mapper>;
+            input-processors = <&zip_xy_scaler 1 1>, <&zip_xy_transform INPUT_TRANSFORM_Y_INVERT>, <&zip_y_only_scroll_mapper>;
         };
     };
 };
