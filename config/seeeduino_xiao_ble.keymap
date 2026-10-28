@@ -3,10 +3,11 @@
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/pointing.h>
 
-// ★ホイールの緩急設定：素早く回した時に3乗カーブで一気に加速させる
+// ★最重要：時間による加速・減衰を「0（無効）」にする
+// これにより1ノッチ目から減衰なしで100%反応し、チャタリングでの3ページ飛びも完全に消えます
 &msc {
-    time-to-max-speed-ms = <200>; // 0.2秒間連続で回すと最高速に到達
-    acceleration-exponent = <3>;  // ★2乗から「3乗カーブ」へ強化（高速回転時の移動量を大幅増）
+    time-to-max-speed-ms = <0>;
+    acceleration-exponent = <0>;
     delay-ms = <0>;
 };
 
@@ -44,20 +45,21 @@
             bindings = <&bt_clr_m>, <&bt_nxt_m>;
         };
 
-        // ★縦スクロール：tap-ms=45msで連続回転の加速を繋げつつ、基本値を900に設定
+        // ★縦スクロール：1ノッチごとに毎回一定の移動量を確実に1発出力する
+        // ※1ノッチの移動量を増やしたい場合は 300 を 400〜500 に、減らしたい場合は 200 に調整してください
         scroll_v: sensor_scroll_v {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_Y(900)>, <&msc MOVE_Y(-900)>;
-            tap-ms = <45>;
+            bindings = <&msc MOVE_Y(300)>, <&msc MOVE_Y(-300)>;
+            tap-ms = <20>;
         };
 
         // 横スクロール
         scroll_h: sensor_scroll_h {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_X(-900)>, <&msc MOVE_X(900)>;
-            tap-ms = <45>;
+            bindings = <&msc MOVE_X(-300)>, <&msc MOVE_X(300)>;
+            tap-ms = <20>;
         };
     };
 
