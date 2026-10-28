@@ -50,7 +50,7 @@
         scroll_v: sensor_scroll_v {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_Y(480)>, <&msc MOVE_Y(-480)>;
+            bindings = <&msc MOVE_Y(600)>, <&msc MOVE_Y(-600)>;
             tap-ms = <20>;
         };
 
@@ -58,7 +58,7 @@
         scroll_h: sensor_scroll_h {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_X(-480)>, <&msc MOVE_X(480)>;
+            bindings = <&msc MOVE_X(-600)>, <&msc MOVE_X(600)>;
             tap-ms = <20>;
         };
     };
