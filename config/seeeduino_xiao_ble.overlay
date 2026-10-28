@@ -4,7 +4,7 @@
 #include <dt-bindings/zmk/input_transform.h>
 
 / {
-    /* ★追加：XIAO内蔵の3色LED（led0〜2）を zmk-rgbled-widget 用の名前に紐付ける */
+    /* XIAO内蔵の3色LED（led0〜2）を zmk-rgbled-widget 用の名前に紐付ける */
     aliases {
         led-red = &led0;
         led-green = &led1;
@@ -28,37 +28,29 @@
             ;
     };
 
-   /* TTC グリーンコア エンコーダ設定 (1周24クリック / 12パルス=48ステップ) */
+    /* TTC グリーンコア エンコーダ設定 (1周24クリック / 12パルス=48ステップ) */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
-        a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP | GPIO_DEBOUNCE)>;
-        b-gpios = <&xiao_d 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP | GPIO_DEBOUNCE)>;
-        steps = <48>; /* ★1周48エッジ（TTC 12パルス仕様の正確な値） */
+        a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        b-gpios = <&xiao_d 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        steps = <48>; /* 1周48エッジ（TTC 12パルス仕様） */
         status = "okay";
     };
 
     sensors: sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&left_encoder>;
-        triggers-per-rotation = <24>; /* ★1周24クリック（48÷24＝2エッジ完結で1回発火） */
+        triggers-per-rotation = <24>; /* 1周24クリック（2エッジ完結で1回発火） */
     };
 
     paw3395_listener {
         compatible = "zmk,input-listener";
         device = <&pd0>;
 
-        /* レイヤー1（サイド長押し）の低速スクロールは廃止（通常のカーソル移動として動作） */
-
         /* レイヤー2（サイド＋右クリック中）：超高速の自由スクロール */
         drag_scroll_fast {
             layers = <2>;
-            /*
-             * 1. &zip_xy_scaler 1 1 : 減速なしの等倍（従来の1/3から3倍に加速）
-             *    ※もしもっと速くしたい場合は <2 1>、少し抑えたい場合は <1 2> に変更
-             * 2. &zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT) : 横・縦の方向を逆転
-             *    ※もし「横だけ逆にして縦は元のまま」にしたい場合は (INPUT_TRANSFORM_X_INVERT) のみに変更してください
-             */
-            input-processors = <&zip_xy_scaler 2 1>, <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT)>, <&zip_xy_to_scroll_mapper>;
+            input-processors = <&zip_xy_scaler 1 1>, <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>, <&zip_xy_to_scroll_mapper>;
         };
     };
 };
