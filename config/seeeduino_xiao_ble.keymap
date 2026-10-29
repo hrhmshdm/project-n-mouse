@@ -51,16 +51,16 @@
         scroll_v: sensor_scroll_v {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_Y(1800)>, <&msc MOVE_Y(-1800)>;
-            tap-ms = <8>;
+            bindings = <&msc MOVE_Y(1400)>, <&msc MOVE_Y(-1400)>;
+            tap-ms = <10>;
         };
 
         // 横スクロール
         scroll_h: sensor_scroll_h {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_X(-1800)>, <&msc MOVE_X(1800)>;
-            tap-ms = <8>;
+            bindings = <&msc MOVE_X(-1400)>, <&msc MOVE_X(1400)>;
+            tap-ms = <10>;
         };
     };
 
