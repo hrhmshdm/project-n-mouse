@@ -6,8 +6,8 @@
 // ★最重要：時間による加速・減衰を「0（無効）」にする
 // これにより1ノッチ目から減衰なしで100%反応し、チャタリングでの3ページ飛びも完全に消えます
 &msc {
-    time-to-max-speed-ms = <200>;
-    acceleration-exponent = <3>;
+    time-to-max-speed-ms = <150>;
+    acceleration-exponent = <1>;
     delay-ms = <0>;
 };
 
@@ -50,16 +50,16 @@
         scroll_v: sensor_scroll_v {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_Y(800)>, <&msc MOVE_Y(-800)>;
-            tap-ms = <45>;
+            bindings = <&msc MOVE_Y(600)>, <&msc MOVE_Y(-600)>;
+            tap-ms = <10>;
         };
 
         // 横スクロール
         scroll_h: sensor_scroll_h {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_X(-800)>, <&msc MOVE_X(800)>;
-            tap-ms = <45>;
+            bindings = <&msc MOVE_X(-600)>, <&msc MOVE_X(600)>;
+            tap-ms = <10>;
         };
     };
 
