@@ -51,7 +51,7 @@
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
             bindings = <&msc MOVE_Y(600)>, <&msc MOVE_Y(-600)>;
-            tap-ms = <10>;
+            tap-ms = <20>;
         };
 
         // 横スクロール
@@ -59,7 +59,7 @@
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
             bindings = <&msc MOVE_X(-600)>, <&msc MOVE_X(600)>;
-            tap-ms = <10>;
+            tap-ms = <20>;
         };
     };
 
@@ -85,7 +85,7 @@
                 &mo 2            // サイド＋右クリック長押し：超高速自由スクロール(レイヤー2)へ
                 &kp LG(TAB)      // サイド＋中クリック：Win + Tab
                 &trans           // サイド自身
-                &bt BT_SEL 0     // サイド＋モードボタン：プロファイル0番へ一発切替
+                &bootloader // SW5: サイド＋モードボタンでファームウェア書込モードへ
             >;
             // サイドを押しながらホイールを回すと横スクロール（逆方向適用済み）
             sensor-bindings = <&scroll_h>;
