@@ -3,11 +3,10 @@
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/pointing.h>
 
-// ★最重要：時間による加速・減衰を「0（無効）」にする
-// これにより1ノッチ目から減衰なしで100%反応し、チャタリングでの3ページ飛びも完全に消えます
+// ★tap-ms=10msでもしっかり初速が出て、かつ高速回転で伸びる設定
 &msc {
-    time-to-max-speed-ms = <200>;
-    acceleration-exponent = <3>;
+    time-to-max-speed-ms = <150>;
+    acceleration-exponent = <1>;  // 10msの短パルスでも減衰しすぎないよう「1」に設定
     delay-ms = <0>;
 };
 
@@ -45,23 +44,21 @@
             bindings = <&bt_clr_m>, <&bt_nxt_m>;
         };
 
-        // ★縦スクロール：1ノッチごとに毎回一定の移動量を確実に1発出力する
-        // ※1ノッチの移動量を増やしたい場合は 300 を 400〜500 に、減らしたい場合は 200 に調整してください
+        // ★縦スクロール：tap-msを「10ms」に極小化し、信号が重なって下に入りっぱなしになるバグを防止
         scroll_v: sensor_scroll_v {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_Y(800)>, <&msc MOVE_Y(-800)>;
-            tap-ms = <45>;
+            bindings = <&msc MOVE_Y(600)>, <&msc MOVE_Y(-600)>;
+            tap-ms = <10>;
         };
 
         // 横スクロール
         scroll_h: sensor_scroll_h {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_X(-800)>, <&msc MOVE_X(800)>;
-            tap-ms = <45>;
+            bindings = <&msc MOVE_X(-600)>, <&msc MOVE_X(600)>;
+            tap-ms = <10>;
         };
-    };
 
     keymap {
         compatible = "zmk,keymap";
