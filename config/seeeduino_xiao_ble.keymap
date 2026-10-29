@@ -51,7 +51,7 @@
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
             bindings = <&msc MOVE_Y(600)>, <&msc MOVE_Y(-600)>;
-            tap-ms = <12>;
+            tap-ms = <15>;
         };
 
         // 横スクロール
@@ -59,7 +59,7 @@
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
             bindings = <&msc MOVE_X(-600)>, <&msc MOVE_X(600)>;
-            tap-ms = <12>;
+            tap-ms = <15>;
         };
     };
 
