@@ -4,7 +4,7 @@
 #include <dt-bindings/zmk/pointing.h>
 #include <behaviors/rgbled_widget.dtsi>
 
-// ★tap-ms=10msでもしっかり初速が出て、かつ高速回転で伸びる設定
+// 慣性スクロール風設定（tap-ms=10msでスタックバグを防止）
 &msc {
     time-to-max-speed-ms = <150>;
     acceleration-exponent = <1>;
@@ -12,6 +12,25 @@
 };
 
 / {
+    // ★マクロは behaviors の外、ルート直下の `macros` ブロックに配置する必要があります
+    macros {
+        bt_0: bt_profile_0 {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&bt BT_SEL 0 &ind_con>;
+        };
+        bt_1: bt_profile_1 {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&bt BT_SEL 1 &ind_con>;
+        };
+        bt_nxt: bt_profile_next {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&bt BT_NXT &ind_con>;
+        };
+    };
+
     combos {
         compatible = "zmk,combos";
 
@@ -57,7 +76,7 @@
     };
 
     behaviors {
-        // ★縦スクロール：tap-msを「10ms」に極小化し、下に入りっぱなしになるバグを防止
+        // 縦スクロール（tap-ms=10msでスタックバグを防止）
         scroll_v: sensor_scroll_v {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
@@ -73,24 +92,7 @@
             tap-ms = <10>;
         };
 
-        // Bluetooth切り替え＋LED表示マクロ（プロファイル0・1の2つに限定 & 交互切替）
-        bt_0: bt_profile_0 {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&bt BT_SEL 0 &ind_con>;
-        };
-        bt_1: bt_profile_1 {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&bt BT_SEL 1 &ind_con>;
-        };
-        bt_nxt: bt_profile_next {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&bt BT_NXT &ind_con>;
-        };
-
-        // 短押しでプロファイル切替、2秒長押しでペアリング解除（BT_CLR）
+        // タップダンス（短押しでプロファイル切替、2秒長押しでペアリング解除）
         td_bt0: tap_dance_bt0 {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
@@ -122,14 +124,14 @@
             sensor-bindings = <&scroll_v>;
         };
 
-        // レイヤー1：サイドボタン押下中（進む・戻る・タブ閉じ・横スクロール）
+        // レイヤー1：サイドボタン押下中
         side_layer {
             bindings = <
                 &mkp MB5    // 0 (SW1): 進む
                 &mkp MB4    // 1 (SW2): 戻る
                 &kp LC(W)   // 2 (SW3): タブを閉じる (Ctrl + W)
                 &trans      // 3 (SW4): そのまま
-                &bootloader // 4 (SW5): サイド＋裏面ボタンでファームウェア書込モードへ
+                &bootloader // 4 (SW5): ファームウェア書込モードへ
             >;
             sensor-bindings = <&scroll_h>;
         };
@@ -146,13 +148,13 @@
             sensor-bindings = <&scroll_v>;
         };
 
-        // レイヤー3：裏面モードボタン押下中（BT 0/1切替・交互トグル・バッテリー残量LED表示）
+        // レイヤー3：裏面モードボタン押下中
         bt_layer {
             bindings = <
-                &td_bt0 BT_CLR 0  // 0 (SW1): 短押しでBT0、2秒長押しで現在のペアリング解除
-                &td_bt1 BT_CLR 0  // 1 (SW2): 短押しでBT1、2秒長押しで現在のペアリング解除
-                &bt_nxt           // 2 (SW3): 中クリックでプロファイル0⇄1を交互にトグル切替
-                &ind_bat          // 3 (SW4): サイドボタンでバッテリー残量をLED色で表示
+                &td_bt0 BT_CLR 0  // 0 (SW1): 短押しでBT0、2秒長押しでペアリング解除
+                &td_bt1 BT_CLR 0  // 1 (SW2): 短押しでBT1、2秒長押しでペアリング解除
+                &bt_nxt           // 2 (SW3): 中クリックでプロファイル0⇄1を交互トグル
+                &ind_bat          // 3 (SW4): サイドボタンでバッテリー残量LED表示
                 &trans            // 4 (SW5): そのまま
             >;
             sensor-bindings = <&scroll_v>;
