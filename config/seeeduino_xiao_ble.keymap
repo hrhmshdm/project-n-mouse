@@ -2,49 +2,62 @@
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/pointing.h>
+#include <behaviors/rgbled_widget.dtsi>
 
 // ★tap-ms=10msでもしっかり初速が出て、かつ高速回転で伸びる設定
 &msc {
     time-to-max-speed-ms = <150>;
-    acceleration-exponent = <1>;  // 10msの短パルスでも減衰しすぎないよう「1」に設定
+    acceleration-exponent = <1>;
     delay-ms = <0>;
 };
 
 / {
-    macros {
-        bt_nxt_m: bt_nxt_macro {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&bt BT_NXT>;
+    combos {
+        compatible = "zmk,combos";
+
+        // 1. 【左(0) ＋ 右(1) 同時押し】：コピー (Ctrl + C)
+        combo_copy {
+            timeout-ms = <50>;
+            key-positions = <0 1>;
+            bindings = <&kp LC(C)>;
+            layers = <0>;
         };
 
-        bt_clr_m: bt_clr_macro {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&bt BT_CLR>;
+        // 2. 【サイド(3) ＋ 左(0) ＋ 右(1) 同時押し】：ペースト (Ctrl + V)
+        combo_paste {
+            timeout-ms = <50>;
+            key-positions = <0 1 3>;
+            bindings = <&kp LC(V)>;
+            layers = <0 1 2>;
+        };
+
+        // 3. 【サイド(3) ＋ 右(1) 同時押し】：自由スクロールモード（レイヤー2）を起動
+        combo_free_scroll {
+            timeout-ms = <50>;
+            key-positions = <1 3>;
+            bindings = <&mo 2>;
+            layers = <0 1>;
+        };
+
+        // 4. 【サイド(3) ＋ 中(2) ＋ 左(0) 同時押し】：プロファイル0へ直接切替
+        combo_bt0 {
+            timeout-ms = <50>;
+            key-positions = <0 2 3>;
+            bindings = <&bt_0>;
+            layers = <0 1>;
+        };
+
+        // 5. 【サイド(3) ＋ 右(1) ＋ 中(2) 同時押し】：プロファイル1へ直接切替
+        combo_bt1 {
+            timeout-ms = <50>;
+            key-positions = <1 2 3>;
+            bindings = <&bt_1>;
+            layers = <0 1>;
         };
     };
 
     behaviors {
-        // SW4用：単押しで「戻る(MB4)」、長押し中はレイヤー1（拡張ボタン＆ホイール横スクロール）
-        lt_mkp: layer_tap_mouse_kp {
-            compatible = "zmk,behavior-hold-tap";
-            #binding-cells = <2>;
-            flavor = "tap-preferred";
-            tapping-term-ms = <180>;
-            bindings = <&mo>, <&mkp>;
-        };
-
-        // SW5用：短押しで次の接続先へ、2秒長押しでペアリング解除
-        bt_mode: bt_mode_hold_tap {
-            compatible = "zmk,behavior-hold-tap";
-            #binding-cells = <2>;
-            flavor = "hold-preferred";
-            tapping-term-ms = <2000>;
-            bindings = <&bt_clr_m>, <&bt_nxt_m>;
-        };
-
-        // ★縦スクロール：tap-msを「10ms」に極小化し、信号が重なって下に入りっぱなしになるバグを防止
+        // ★縦スクロール：tap-msを「10ms」に極小化し、下に入りっぱなしになるバグを防止
         scroll_v: sensor_scroll_v {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
@@ -60,42 +73,87 @@
             tap-ms = <10>;
         };
 
+        // Bluetooth切り替え＋LED表示マクロ（プロファイル0・1の2つに限定 & 交互切替）
+        bt_0: bt_profile_0 {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&bt BT_SEL 0 &ind_con>;
+        };
+        bt_1: bt_profile_1 {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&bt BT_SEL 1 &ind_con>;
+        };
+        bt_nxt: bt_profile_next {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&bt BT_NXT &ind_con>;
+        };
+
+        // 短押しでプロファイル切替、2秒長押しでペアリング解除（BT_CLR）
+        td_bt0: tap_dance_bt0 {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <2000>;
+            bindings = <&bt>, <&bt_0>;
+        };
+        td_bt1: tap_dance_bt1 {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <2000>;
+            bindings = <&bt>, <&bt_1>;
+        };
+    };
+
     keymap {
         compatible = "zmk,keymap";
 
         // レイヤー0：通常モード
         default_layer {
             bindings = <
-                &mkp LCLK       // 左クリック
-                &mkp RCLK       // 右クリック
-                &mkp MCLK       // 中クリック
-                &lt_mkp 1 MB4   // サイド：単押し「戻る」、長押しでレイヤー1へ
-                &bt_mode 0 0    // モード：短押し「プロファイル順送り」、2秒長押し「ペアリング解除」
+                &mkp LCLK  // 0 (SW1): 左クリック
+                &mkp RCLK  // 1 (SW2): 右クリック
+                &mkp MCLK  // 2 (SW3): 中クリック
+                &mo 1      // 3 (SW4): サイドボタン（押している間レイヤー1へ）
+                &mo 3      // 4 (SW5): 裏面モードボタン（押している間レイヤー3へ）
             >;
             sensor-bindings = <&scroll_v>;
         };
 
-        // レイヤー1：サイドボタン長押し中（カーソル移動は通常通り）
-        scroll_layer {
+        // レイヤー1：サイドボタン押下中（進む・戻る・タブ閉じ・横スクロール）
+        side_layer {
             bindings = <
-                &mkp MB5         // サイド＋左クリック：進む(MB5)
-                &mo 2            // サイド＋右クリック長押し：超高速自由スクロール(レイヤー2)へ
-                &kp LG(TAB)      // サイド＋中クリック：Win + Tab
-                &trans           // サイド自身
-                &bt BT_SEL 0     // サイド＋モードボタン：プロファイル0番へ一発切替
+                &mkp MB5    // 0 (SW1): 進む
+                &mkp MB4    // 1 (SW2): 戻る
+                &kp LC(W)   // 2 (SW3): タブを閉じる (Ctrl + W)
+                &trans      // 3 (SW4): そのまま
+                &bootloader // 4 (SW5): サイド＋裏面ボタンでファームウェア書込モードへ
             >;
-            // サイドを押しながらホイールを回すと横スクロール（逆方向適用済み）
             sensor-bindings = <&scroll_h>;
         };
 
-        // レイヤー2：サイド＋右クリック長押し中（マウスを動かすと超高速・自由スクロール）
-        fast_scroll_layer {
+        // レイヤー2：自由スクロールモード（サイド＋右 同時押し中）
+        scroll_layer {
             bindings = <
-                &bt BT_SEL 0     // サイド＋右＋左クリック：プロファイル0（Win）へ切替
-                &trans
-                &bt BT_SEL 1     // サイド＋右＋中クリック：プロファイル1（Mac）へ切替
                 &trans
                 &trans
+                &trans
+                &trans
+                &trans
+            >;
+            sensor-bindings = <&scroll_v>;
+        };
+
+        // レイヤー3：裏面モードボタン押下中（BT 0/1切替・交互トグル・バッテリー残量LED表示）
+        bt_layer {
+            bindings = <
+                &td_bt0 BT_CLR 0  // 0 (SW1): 短押しでBT0、2秒長押しで現在のペアリング解除
+                &td_bt1 BT_CLR 0  // 1 (SW2): 短押しでBT1、2秒長押しで現在のペアリング解除
+                &bt_nxt           // 2 (SW3): 中クリックでプロファイル0⇄1を交互にトグル切替
+                &ind_bat          // 3 (SW4): サイドボタンでバッテリー残量をLED色で表示
+                &trans            // 4 (SW5): そのまま
             >;
             sensor-bindings = <&scroll_v>;
         };
