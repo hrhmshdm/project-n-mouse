@@ -1,0 +1,13 @@
+description: Encoder Mouse Scroll Behavior (One-shot)
+
+compatible: "zmk,behavior-encoder-mouse-scroll"
+
+properties:
+  "#sensor-binding-cells":
+    type: int
+    required: true
+    const: 2
+
+sensor-binding-cells:
+  - param1
+  - param2

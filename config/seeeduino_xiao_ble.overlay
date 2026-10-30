@@ -1,8 +1,16 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
-#include <input/processors.dtsi> // ★追加：Input Processor（スクロール変換・感度調整）を使うためのヘッダ
+#include <input/processors.dtsi>
+#include <dt-bindings/zmk/input_transform.h>
 
 / {
+    /* XIAO内蔵の3色LED（led0〜2）を zmk-rgbled-widget 用の名前に紐付ける */
+    aliases {
+        led-red = &led0;
+        led-green = &led1;
+        led-blue = &led2;
+    };
+
     chosen {
         zmk,kscan = &kscan0;
     };
@@ -12,53 +20,49 @@
         compatible = "zmk,kscan-gpio-direct";
         wakeup-source;
         input-gpios
-            = <&xiao_d 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW1: BTN_LEFT */
-            , <&xiao_d 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW2: BTN_RIGHT */
-            , <&xiao_d 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW3: BTN_MIDDLE */
-            , <&xiao_d 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW4: BTN_SIDE */
-            , <&xiao_d 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW5: BTN_MODE */
+            = <&xiao_d 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW1: 左クリック */
+            , <&xiao_d 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW2: 右クリック */
+            , <&xiao_d 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW3: 中クリック */
+            , <&xiao_d 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW4: サイドボタン */
+            , <&xiao_d 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW5: モードボタン */
             ;
     };
 
-    /* ロータリーエンコーダ設定 (D5, D6) */
+    /* TTC グリーンコア エンコーダ設定 (図面仕様: 12パルス / 24デテント) */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
-        a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>; /* ENC_A */
-        b-gpios = <&xiao_d 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>; /* ENC_B */
-        steps = <24>;
+        a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        b-gpios = <&xiao_d 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        steps = <12>; /* ★12パルス指定（24デテントとの組み合わせで1ノッチ＝1発火に一致） */
         status = "okay";
     };
 
     sensors: sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&left_encoder>;
-        triggers-per-rotation = <12>;
+        triggers-per-rotation = <24>; /* ★24デテント指定 */
     };
 
-    /* PAW3395の移動データをZMKのマウスカーソルへ繋ぐリスナー */
     paw3395_listener {
         compatible = "zmk,input-listener";
         device = <&pd0>;
 
-        /* ★追加：レイヤー2（サイド＋右クリック中）のときだけマウス移動を無段階スクロールに変換 */
-        drag_scroll {
+        /* レイヤー2（サイド＋右クリック中）：上下左右すべて自由に動く超高速スクロール */
+        drag_scroll_fast {
             layers = <2>;
-            /* 1000 CPIのままだとスクロールが速すぎるため、1/16に減速してからスクロール変換 */
-            input-processors = <&zip_xy_scaler 1 16>, <&zip_xy_to_scroll_mapper>;
+            input-processors = <&zip_xy_scaler 1 1>, <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>, <&zip_xy_to_scroll_mapper>;
         };
     };
 };
 
-/* XIAO標準のI2Cを無効化（ピン競合防止） */
 &i2c0 {
     status = "disabled";
 };
 
-/* SPI2通信とPAW3395センサーの設定 (SCK=D8, MISO=D9, MOSI=D10, CS=D7, IRQ=NFC1) */
 &spi2 {
     compatible = "nordic,nrf-spim";
     status = "okay";
-    cs-gpios = <&xiao_d 7 GPIO_ACTIVE_LOW>; /* D7 (P1.12): nCS */
+    cs-gpios = <&xiao_d 7 GPIO_ACTIVE_LOW>;
 
     pd0: pd@0 {
         compatible = "pixart,paw3395";
@@ -66,21 +70,11 @@
         label = "MOU0";
         reg = <0>;
         spi-max-frequency = <4000000>;
-
-        /* MOTIONピン: NFC1 (P0.09) */
         irq-gpios = <&gpio0 9 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-
-        /* マウス感度 (DPI/CPI) の初期値 */
         cpi = <1000>;
-
-        /* 必須設定: 相対座標(REL)のX軸・Y軸移動イベントとして出力 */
         evt-type = <INPUT_EV_REL>;
         x-input-code = <INPUT_REL_X>;
         y-input-code = <INPUT_REL_Y>;
-
-        /* 基板の向きに合わせて後からカーソル方向を調整するオプション */
-        // swap-xy;
         invert-x;
-        // invert-y;
     };
 };
