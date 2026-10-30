@@ -4,6 +4,27 @@
 #include <dt-bindings/zmk/pointing.h>
 
 / {
+    // 複数ボタンの同時押し（コピー・ペースト）を判定するコンボ定義
+    combos {
+        compatible = "zmk,combos";
+
+        // レイヤー0：左クリック ＋ 右クリック ＝ コピー (Ctrl + C)
+        combo_copy {
+            timeout-ms = <50>;
+            key-positions = <0 1>; // 0: LCLK, 1: RCLK
+            bindings = <&kp LC(C)>;
+            layers = <0>;
+        };
+
+        // レイヤー1：サイドボタン長押し中 ＋ 左クリック ＋ 右クリック ＝ ペースト (Ctrl + V)
+        combo_paste {
+            timeout-ms = <50>;
+            key-positions = <0 1>; // 0: LCLK, 1: RCLK
+            bindings = <&kp LC(V)>;
+            layers = <1>;
+        };
+    };
+
     macros {
         bt_nxt_m: bt_nxt_macro {
             compatible = "zmk,behavior-macro";
@@ -19,8 +40,17 @@
     };
 
     behaviors {
-        // SW4用：単押しで「戻る(MB4)」、長押し中はレイヤー1（拡張ボタン＆ホイール横スクロール）
+        // SW4用：単押しで「戻る(MB4)」、長押し中はレイヤー1へ
         lt_mkp: layer_tap_mouse_kp {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <180>;
+            bindings = <&mo>, <&mkp>;
+        };
+
+        // 右クリック（RCLK）を長押しするとレイヤー2に切り替わるホールドタップ（レイヤー1内）
+        lt_rclk_layer2: layer_tap_rclk_layer2 {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
             flavor = "tap-preferred";
@@ -37,7 +67,7 @@
             bindings = <&bt_clr_m>, <&bt_nxt_m>;
         };
 
-        // ★zmk_encoder（v0.3移植版）：1ノッチごとに整数「1」をダイレクト送信
+        // v0.3移植版の1ノッチ＝1ダイレクト送信スクロール
         ec_ms: encoder_mouse_scroll {
             compatible = "zmk,behavior-encoder-mouse-scroll";
             #sensor-binding-cells = <2>;
@@ -47,37 +77,36 @@
     keymap {
         compatible = "zmk,keymap";
 
-        // レイヤー0：通常モード（ホイール：縦スクロール）
+        // レイヤー0：通常モード（縦スクロール ＆ 左＋右クリックでコピー）
         default_layer {
             bindings = <
-                &mkp LCLK       // 左クリック
-                &mkp RCLK       // 右クリック
-                &mkp MCLK       // 中クリック
-                &lt_mkp 1 MB4   // サイド：単押し「戻る」、長押しでレイヤー1へ
-                &bt_mode 0 0    // モード：短押し「プロファイル順送り」、2秒長押し「ペアリング解除」
+                &mkp LCLK       // 0: 左クリック
+                &mkp RCLK       // 1: 右クリック
+                &mkp MCLK       // 2: 中クリック
+                &lt_mkp 1 MB4   // 3: サイド（単押し:戻る / 長押し:レイヤー1へ）
+                &bt_mode 0 0    // 4: モード（短押し:次へ / 長押し:ペアリング解除）
             >;
-            // ※上下の回転方向が逆の場合は SCRL_UP と SCRL_DOWN を入れ替えてください
             sensor-bindings = <&ec_ms SCRL_UP SCRL_DOWN>;
         };
 
-        // レイヤー1：サイドボタン長押し中（ホイール：横スクロール）
+        // レイヤー1：サイドボタン長押し中（横スクロール ＆ 右クリック長押しでレイヤー2へ）
         scroll_layer {
             bindings = <
-                &mkp MB5         // サイド＋左クリック：進む(MB5)
-                &mo 2            // サイド＋右クリック長押し：超高速自由スクロール(レイヤー2)へ
-                &kp LG(TAB)      // サイド＋中クリック：Win + Tab
-                &trans           // サイド自身
-                &bootloader      // SW5: サイド＋モードボタンでファームウェア書込モードへ
+                &mkp MB5                 // サイド＋左クリック：進む(MB5)
+                &lt_rclk_layer2 2 RCLK   // 右クリック（単押し:右クリック / 長押し:レイヤー2へ）
+                &kp LG(TAB)              // サイド＋中クリック：Win + Tab
+                &trans                   // サイド自身
+                &bootloader              // SW5: ファームウェア書込モード
             >;
             sensor-bindings = <&ec_ms SCRL_LEFT SCRL_RIGHT>;
         };
 
-        // レイヤー2：サイド＋右クリック長押し中（マウスを動かすと超高速・自由スクロール）
+        // レイヤー2：サイド ＋ 右クリック長押し中（自由＆高速スクロール）
         fast_scroll_layer {
             bindings = <
-                &bt BT_SEL 0     // サイド＋右＋左クリック：プロファイル0（Win）へ切替
+                &bt BT_SEL 0     // サイド ＋ 右長押し ＋ 左クリック ＝ プロファイル 0
+                &bt BT_SEL 1     // サイド ＋ 右長押し ＋ 中クリック ＝ プロファイル 1
                 &trans
-                &bt BT_SEL 1     // サイド＋右＋中クリック：プロファイル1（Mac）へ切替
                 &trans
                 &trans
             >;
