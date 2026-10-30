@@ -10,15 +10,11 @@
 #include <drivers/behavior.h>
 #include <zephyr/logging/log.h>
 #include <zmk/behavior.h>
-
 #include <zmk/keymap.h>
 #include <zmk/virtual_key_position.h>
-
-#if !defined(CONFIG_ZMK_SPLIT) || defined(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
 #include <zmk/hid.h>
 #include <zmk/endpoints.h>
 #include <dt-bindings/zmk/pointing.h>
-#endif
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
@@ -62,13 +58,13 @@ static int behavior_ec_ms_accept_data(struct zmk_behavior_binding *binding,
     }
 
     int trigger_degrees = 360 / sensor_config->triggers_per_rotation;
-    int triggers = rem->val1 / trigger_degrees;
+    if (trigger_degrees <= 0) {
+        trigger_degrees = 15;
+    }
 
+    int triggers = rem->val1 / trigger_degrees;
     rem->val1 %= trigger_degrees;
     *trig = triggers;
-
-    LOG_DBG("ec_ms accept [sensor %d]: val1=%d, val2=%d, remainder=%d, triggers=%d",
-            sensor_index, value.val1, value.val2, rem->val1, triggers);
 
     return 0;
 }
@@ -81,41 +77,38 @@ static int behavior_ec_ms_process(struct zmk_behavior_binding *binding,
         return -ENODEV;
     }
     struct behavior_ec_ms_data *data = dev->data;
-    
+
     int sensor_index = ZMK_SENSOR_POSITION_FROM_VIRTUAL_KEY_POSITION(event.position);
     int32_t triggers = data->triggers[sensor_index][event.layer];
-    
-    /* DISCARD時も正しくゼロクリアされる */
-    data->triggers[sensor_index][event.layer] = 0; 
 
-    if (mode != BEHAVIOR_SENSOR_BINDING_PROCESS_MODE_TRIGGER) {
+    data->triggers[sensor_index][event.layer] = 0;
+
+    if (mode != BEHAVIOR_SENSOR_BINDING_PROCESS_MODE_TRIGGER || triggers == 0) {
         return ZMK_BEHAVIOR_TRANSPARENT;
     }
 
-    if (triggers == 0) {
-        return ZMK_BEHAVIOR_TRANSPARENT;
-    }
-
-#if !defined(CONFIG_ZMK_SPLIT) || defined(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
     uint32_t param = (triggers > 0) ? binding->param1 : binding->param2;
 
     int16_t h_wheel = MOVE_X_DECODE(param);
     int16_t wheel = MOVE_Y_DECODE(param);
 
-    /* スムーススクロール無効環境に合わせて、1ノッチ＝きっちり「1」または「-1」に正規化 */
-    if (h_wheel > 0) h_wheel = 1;
-    else if (h_wheel < 0) h_wheel = -1;
+    /* SMOOTH_SCROLLINGが有効なら16、無効なら1を1ノッチの基本単位にする */
+#if IS_ENABLED(CONFIG_ZMK_POINTING_SMOOTH_SCROLLING)
+    int16_t step = 16;
+#else
+    int16_t step = 1;
+#endif
 
-    if (wheel > 0) wheel = 1;
-    else if (wheel < 0) wheel = -1;
+    if (h_wheel > 0) h_wheel = step;
+    else if (h_wheel < 0) h_wheel = -step;
+
+    if (wheel > 0) wheel = step;
+    else if (wheel < 0) wheel = -step;
 
     int abs_trig = (triggers > 0) ? triggers : -triggers;
     h_wheel *= abs_trig;
     wheel *= abs_trig;
 
-    LOG_DBG("Encoder Mouse Scroll Sent: h_wheel=%d, wheel=%d", h_wheel, wheel);
-
-    /* ZMK v0.3のAPI（zmk_endpoints_send_mouse_report）でダイレクト送信＆即ゼロクリア */
     zmk_hid_mouse_scroll_set(h_wheel, wheel);
     zmk_endpoints_send_mouse_report();
 
@@ -123,9 +116,6 @@ static int behavior_ec_ms_process(struct zmk_behavior_binding *binding,
     zmk_endpoints_send_mouse_report();
 
     return ZMK_BEHAVIOR_OPAQUE;
-#else
-    return ZMK_BEHAVIOR_TRANSPARENT;
-#endif
 }
 
 static const struct behavior_driver_api behavior_encoder_mouse_scroll_driver_api = {
