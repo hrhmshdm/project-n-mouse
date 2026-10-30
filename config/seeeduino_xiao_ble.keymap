@@ -3,15 +3,6 @@
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/pointing.h>
 
-// ★最重要：時間による加速・減衰を「0（無効）」にする
-// これにより1ノッチ目から減衰なしで100%反応し、チャタリングでの3ページ飛びも完全に消えます
-&msc {
-    trigger-period-ms = <5>;
-    time-to-max-speed-ms = <150>;
-    acceleration-exponent = <1>;
-    delay-ms = <0>;
-};
-
 / {
     macros {
         bt_nxt_m: bt_nxt_macro {
@@ -46,28 +37,17 @@
             bindings = <&bt_clr_m>, <&bt_nxt_m>;
         };
 
-        // ★縦スクロール：1ノッチごとに毎回一定の移動量を確実に1発出力する
-        // ※1ノッチの移動量を増やしたい場合は 300 を 400〜500 に、減らしたい場合は 200 に調整してください
-        scroll_v: sensor_scroll_v {
-            compatible = "zmk,behavior-sensor-rotate";
-            #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_Y(1400)>, <&msc MOVE_Y(-1400)>;
-            tap-ms = <10>;
-        };
-
-        // 横スクロール
-        scroll_h: sensor_scroll_h {
-            compatible = "zmk,behavior-sensor-rotate";
-            #sensor-binding-cells = <0>;
-            bindings = <&msc MOVE_X(-1400)>, <&msc MOVE_X(1400)>;
-            tap-ms = <10>;
+        // ★zmk_encoder（v0.3移植版）：1ノッチごとに整数「1」をダイレクト送信
+        ec_ms: encoder_mouse_scroll {
+            compatible = "zmk,behavior-encoder-mouse-scroll";
+            #sensor-binding-cells = <2>;
         };
     };
 
     keymap {
         compatible = "zmk,keymap";
 
-        // レイヤー0：通常モード
+        // レイヤー0：通常モード（ホイール：縦スクロール）
         default_layer {
             bindings = <
                 &mkp LCLK       // 左クリック
@@ -76,20 +56,20 @@
                 &lt_mkp 1 MB4   // サイド：単押し「戻る」、長押しでレイヤー1へ
                 &bt_mode 0 0    // モード：短押し「プロファイル順送り」、2秒長押し「ペアリング解除」
             >;
-            sensor-bindings = <&scroll_v>;
+            // ※上下の回転方向が逆の場合は SCRL_UP と SCRL_DOWN を入れ替えてください
+            sensor-bindings = <&ec_ms SCRL_UP SCRL_DOWN>;
         };
 
-        // レイヤー1：サイドボタン長押し中（カーソル移動は通常通り）
+        // レイヤー1：サイドボタン長押し中（ホイール：横スクロール）
         scroll_layer {
             bindings = <
                 &mkp MB5         // サイド＋左クリック：進む(MB5)
                 &mo 2            // サイド＋右クリック長押し：超高速自由スクロール(レイヤー2)へ
                 &kp LG(TAB)      // サイド＋中クリック：Win + Tab
                 &trans           // サイド自身
-                &bootloader // SW5: サイド＋モードボタンでファームウェア書込モードへ
+                &bootloader      // SW5: サイド＋モードボタンでファームウェア書込モードへ
             >;
-            // サイドを押しながらホイールを回すと横スクロール（逆方向適用済み）
-            sensor-bindings = <&scroll_h>;
+            sensor-bindings = <&ec_ms SCRL_LEFT SCRL_RIGHT>;
         };
 
         // レイヤー2：サイド＋右クリック長押し中（マウスを動かすと超高速・自由スクロール）
@@ -101,7 +81,7 @@
                 &trans
                 &trans
             >;
-            sensor-bindings = <&scroll_v>;
+            sensor-bindings = <&ec_ms SCRL_UP SCRL_DOWN>;
         };
     };
 };
