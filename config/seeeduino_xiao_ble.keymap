@@ -23,20 +23,6 @@
             bindings = <&kp LC(V)>;
             layers = <1>;
         };
-
-        // モードボタン(SW5) ＋ 左クリック ＝ プロファイル 0 切替
-        combo_bt0 {
-            timeout-ms = <80>;
-            key-positions = <4 0>; // 4: モードボタン, 0: LCLK
-            bindings = <&bt BT_SEL 0>;
-        };
-
-        // モードボタン(SW5) ＋ 右クリック ＝ プロファイル 1 切替
-        combo_bt1 {
-            timeout-ms = <80>;
-            key-positions = <4 1>; // 4: モードボタン, 1: RCLK
-            bindings = <&bt BT_SEL 1>;
-        };
     };
 
     macros {
@@ -118,9 +104,9 @@
         // レイヤー2：サイド ＋ 右クリック長押し中（自由＆高速スクロール）
         fast_scroll_layer {
             bindings = <
+                &bt BT_SEL 0     // サイド＋右＋左クリック：プロファイル0（Win）へ切替
                 &trans
-                &trans
-                &trans
+                &bt BT_SEL 1     // サイド＋右＋中クリック：プロファイル1（Mac）へ切替
                 &trans
                 &trans
             >;
