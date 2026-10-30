@@ -4,7 +4,7 @@
 #include <dt-bindings/zmk/pointing.h>
 
 / {
-    // 複数ボタンの同時押し（コピー・ペースト）を判定するコンボ定義
+    // 同時押し（コンボ）の定義
     combos {
         compatible = "zmk,combos";
 
@@ -16,12 +16,26 @@
             layers = <0>;
         };
 
-        // レイヤー1：サイドボタン長押し中 ＋ 左クリック ＋ 右クリック ＝ ペースト (Ctrl + V)
+        // レイヤー1：サイド長押し中 ＋ 左クリック ＋ 右クリック ＝ ペースト (Ctrl + V)
         combo_paste {
             timeout-ms = <50>;
             key-positions = <0 1>; // 0: LCLK, 1: RCLK
             bindings = <&kp LC(V)>;
             layers = <1>;
+        };
+
+        // モードボタン(SW5) ＋ 左クリック ＝ プロファイル 0 切替
+        combo_bt0 {
+            timeout-ms = <80>;
+            key-positions = <4 0>; // 4: モードボタン, 0: LCLK
+            bindings = <&bt BT_SEL 0>;
+        };
+
+        // モードボタン(SW5) ＋ 右クリック ＝ プロファイル 1 切替
+        combo_bt1 {
+            timeout-ms = <80>;
+            key-positions = <4 1>; // 4: モードボタン, 1: RCLK
+            bindings = <&bt BT_SEL 1>;
         };
     };
 
@@ -49,7 +63,7 @@
             bindings = <&mo>, <&mkp>;
         };
 
-        // 右クリック（RCLK）を長押しするとレイヤー2に切り替わるホールドタップ（レイヤー1内）
+        // レイア1内：右クリック（RCLK）長押しでレイヤー2（高速スクロール）へ
         lt_rclk_layer2: layer_tap_rclk_layer2 {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
@@ -77,24 +91,24 @@
     keymap {
         compatible = "zmk,keymap";
 
-        // レイヤー0：通常モード（縦スクロール ＆ 左＋右クリックでコピー）
+        // レイヤー0：通常モード（縦スクロール ＆ 左右同時でコピー ＆ モード＋左右でBT切替）
         default_layer {
             bindings = <
                 &mkp LCLK       // 0: 左クリック
                 &mkp RCLK       // 1: 右クリック
                 &mkp MCLK       // 2: 中クリック
                 &lt_mkp 1 MB4   // 3: サイド（単押し:戻る / 長押し:レイヤー1へ）
-                &bt_mode 0 0    // 4: モード（短押し:次へ / 長押し:ペアリング解除）
+                &bt_mode 0 0    // 4: モード（短押し:次へ / 2秒長押し:ペアリング解除）
             >;
             sensor-bindings = <&ec_ms SCRL_UP SCRL_DOWN>;
         };
 
-        // レイヤー1：サイドボタン長押し中（横スクロール ＆ 右クリック長押しでレイヤー2へ）
+        // レイヤー1：サイドボタン長押し中（横スクロール ＆ 右長押しでレイヤー2へ ＆ 左右同時でペースト）
         scroll_layer {
             bindings = <
-                &mkp MB5                 // サイド＋左クリック：進む(MB5)
+                &mkp MB5         // サイド＋左クリック：進む(MB5)
                 &lt_rclk_layer2 2 RCLK   // 右クリック（単押し:右クリック / 長押し:レイヤー2へ）
-                &kp LG(TAB)              // サイド＋中クリック：Win + Tab
+                &kp LG(TAB)      // サイド＋中クリック：Win + Tab
                 &trans                   // サイド自身
                 &bootloader              // SW5: ファームウェア書込モード
             >;
@@ -104,8 +118,8 @@
         // レイヤー2：サイド ＋ 右クリック長押し中（自由＆高速スクロール）
         fast_scroll_layer {
             bindings = <
-                &bt BT_SEL 0     // サイド ＋ 右長押し ＋ 左クリック ＝ プロファイル 0
-                &bt BT_SEL 1     // サイド ＋ 右長押し ＋ 中クリック ＝ プロファイル 1
+                &trans
+                &trans
                 &trans
                 &trans
                 &trans
