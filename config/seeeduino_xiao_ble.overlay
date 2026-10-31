@@ -38,6 +38,23 @@
      * TTC Green Core Mechanical Rotary Encoder (12 Pulses / 24 Detents)
      * TTC グリーンコア エンコーダ設定 (仕様: 12パルス / 24デテント)
      */
+    /*
+     * =========================================================================
+     * [Hardware Spec] TTC Green Core Mechanical Rotary Encoder
+     * -------------------------------------------------------------------------
+     * [Pins / ピン配置]:
+     *   - Channel A: D5 (P0.02)
+     *   - Channel B: D6 (P0.03)
+     *
+     * [Detents vs Pulses / パルスとデテントの整合性]:
+     *   TTC グリーンコアは 1回転あたり「24ノッチ（デテント）」に対し、
+     *   電気信号は「12パルス（周期）」を出力する仕様。
+     *   - `steps = <12>;` (ドライバー層のパルス数定義)
+     *   - `triggers-per-rotation = <24>;` (ZMKセンサー層のノッチ数定義)
+     *   この 12 : 24 の比率に設定することで、物理的に「カチッ」と1目盛り回した
+     *   時にちょうど1回だけスクロール信号が発火します。
+     * =========================================================================
+     */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
         a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
