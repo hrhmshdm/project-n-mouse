@@ -10,6 +10,11 @@ Designed around the **Seeed Studio XIAO nRF52840 (BLE)**, featuring a **PixArt P
 
 The physical design and transparent aesthetic of this project were inspired by the charging case of **Nothing Ear**. It aims to bring that minimalist, transparent industrial design language into an open-source, ultra-compact wireless mouse.
 
+<img width="3359" height="2142" alt="Image" src="https://github.com/user-attachments/assets/516aef2c-0d70-4ce6-85a7-541295b95843" />
+
+
+
+
 > ⚠️ **Disclaimer**: This is an independent, non-commercial DIY maker project. It is **not affiliated with, endorsed by, or associated with Nothing Technology Limited** in any way.
 
 ---
@@ -140,3 +145,6 @@ The physical design and transparent aesthetic of this project were inspired by t
 
 ## 📄 License
 MIT License
+
+<img width="3024" height="4032" alt="Image" src="https://github.com/user-attachments/assets/09af6861-6cd9-40f4-ad3c-32fd9120923d" />
+<img width="2732" height="2685" alt="Image" src="https://github.com/user-attachments/assets/e35d8247-265b-4b80-95ef-54f8910618aa" />
