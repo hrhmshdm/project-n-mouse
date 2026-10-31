@@ -48,11 +48,12 @@ The physical design and transparent aesthetic of this project were inspired by t
 
 ## 📦 Key Hardware Components (BOM Highlights)
 
-### Active Components & Sensors
+### Acctive Components & Sensors
 - **Sensor**: PixArt PAW3395 (1000 CPI native configuration)
 - **Power LDO (U3)**: Texas Instruments TLV74318PDBVR (1.8V Low-Dropout Regulator, SOT-23-5)[cite: 1]
-- **Primary Switches (L/R)**: Kailh Silent Micro Switch (6x6x7.3mm, 2-pin)[cite: 3]
-- **Tactile Switches (Aux)**: 4.5x4.5mm Tactile Switches (TS-4501 series, H=4.3mm / H=5.0mm)[cite: 2, 5]
+- **Switches (L / R / Side)**: Kailh Silent Micro Switch (6x6x7.3mm, 2-pin) × 3[cite: 3]
+- **Middle Click Switch**: Short Tactile Switch (4.5x4.5x4.3mm, TS-4501)[cite: 2]
+- **Mode Switch**: Tall Tactile Switch (4.5x4.5x5.0mm, TS-4501)[cite: 5]
 - **Power Switch**: Subminiature Slide Switch (MSK12C01 series)[cite: 2]
 - **Encoder**: TTC Green Core Mechanical Rotary Encoder (12 Pulses / 24 Detents)
 - **Battery**: 3.7V 200mAh 601230 Rechargeable Li-Po Battery[cite: 4]
