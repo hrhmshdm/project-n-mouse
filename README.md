@@ -4,12 +4,16 @@ Custom ultra-compact wireless mouse firmware powered by **ZMK Firmware (v0.3)** 
 
 Designed around the **Seeed Studio XIAO nRF52840 (BLE)**, featuring a **PixArt PAW3395** optical sensor, **TTC Green Core mechanical rotary encoder**, and **Kailh Silent Micro Switches**.
 
+> 🇯🇵 **[日本語のドキュメントはこちら (Japanese Documentation)](README_ja.md)**
+
 ---
 
 ## 💡 Concept & Design Inspiration
 
 The physical design and transparent aesthetic of this project were inspired by the charging case of **Nothing Ear**. It aims to bring that minimalist, transparent industrial design language into an open-source, ultra-compact wireless mouse.
+
 <img width="3359" height="2142" alt="Image" src="https://github.com/user-attachments/assets/516aef2c-0d70-4ce6-85a7-541295b95843" />
+
 > ⚠️ **Disclaimer & Project Notice**: 
 > - This is an independent, non-commercial DIY maker project. It is **not affiliated with, endorsed by, or associated with Nothing Technology Limited** in any way.
 > - **Beginner's Project Notice**: This is my very first custom hardware/firmware project. As a hobbyist build, please be aware that the repository file structure, control logic, and electronic circuit design patterns may deviate from standard engineering conventions or best practices. Use or reference at your own discretion.
@@ -18,7 +22,7 @@ The physical design and transparent aesthetic of this project were inspired by t
 
 ## 🛠 Hardware Specifications & Pinout
 
-Schematic diagrams and PCB assembly reference photos are available in the [`hardware/`](hardware/) directory.
+Schematic diagrams, PCB overview, and assembly reference photos are available in the [`hardware/`](hardware/) directory[cite: 2].
 
 ### MCU & Indicators
 - **MCU**: Seeed Studio XIAO nRF52840 (BLE)
@@ -136,8 +140,13 @@ Schematic diagrams and PCB assembly reference photos are available in the [`hard
 
 ---
 
-## 📄 License
-MIT License
+## 📄 License & Terms
 
-<img width="3024" height="4032" alt="Image" src="https://github.com/user-attachments/assets/09af6861-6cd9-40f4-ad3c-32fd9120923d" />
-<img width="2732" height="2685" alt="Image" src="https://github.com/user-attachments/assets/e35d8247-265b-4b80-95ef-54f8910618aa" />
+This project utilizes a dual-licensing model to protect hardware designs while keeping firmware open:
+
+- **Firmware Source Code & Configuration**: Licensed under the **[MIT License](LICENSE)**.
+- **Hardware Reference, Schematics & Photos**: Licensed under the **[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/)**[cite: 2].
+
+### 🚫 Non-Commercial Restrictions
+- **Allowed**: Personal DIY building, hobbyist modifications, circuit tracing, and non-commercial educational use.
+- **Prohibited**: Any commercial use, mass production, kit reselling, or monetization of physical units or derivative hardware designs without explicit prior written permission.
