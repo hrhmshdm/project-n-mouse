@@ -9,33 +9,31 @@ Designed around the **Seeed Studio XIAO nRF52840 (BLE)**, featuring a **PixArt P
 ## 💡 Concept & Design Inspiration
 
 The physical design and transparent aesthetic of this project were inspired by the charging case of **Nothing Ear**. It aims to bring that minimalist, transparent industrial design language into an open-source, ultra-compact wireless mouse.
-
 <img width="3359" height="2142" alt="Image" src="https://github.com/user-attachments/assets/516aef2c-0d70-4ce6-85a7-541295b95843" />
-
-
-
-
-> ⚠️ **Disclaimer**: This is an independent, non-commercial DIY maker project. It is **not affiliated with, endorsed by, or associated with Nothing Technology Limited** in any way.
+> ⚠️ **Disclaimer & Project Notice**: 
+> - This is an independent, non-commercial DIY maker project. It is **not affiliated with, endorsed by, or associated with Nothing Technology Limited** in any way.
+> - **Beginner's Project Notice**: This is my very first custom hardware/firmware project. As a hobbyist build, please be aware that the repository file structure, control logic, and electronic circuit design patterns may deviate from standard engineering conventions or best practices. Use or reference at your own discretion.
 
 ---
 
 ## 🛠 Hardware Specifications & Pinout
 
+Schematic diagrams and PCB assembly reference photos are available in the [`hardware/`](hardware/) directory.
+
 ### MCU & Indicators
 - **MCU**: Seeed Studio XIAO nRF52840 (BLE)
 - **Status LED**: Integrated 3-color RGB LED mapped via `zmk-rgbled-widget` (`led-red`, `led-green`, `led-blue`)
-- **Battery**: 3.7V 200mAh Li-Po (601230, JST 2.0 2-Pin)[cite: 4]
-- **MCU Interconnect**: MAC8 Spring Pin Header / Conthrough (12-Pin, H=3.5mm)[cite: 6]
+- **Battery**: 3.7V 200mAh Li-Po (601230, JST 2.0 2-Pin)
 
 ### Pin Assignment Table
 
 | Pin | Function / Target | Component / Description | Type |
 | :--- | :--- | :--- | :--- |
-| **D0** | Left Click (SW1) | Kailh Silent Micro Switch (6x6x7.3mm)[cite: 3] | Direct GPIO (Active Low) |
-| **D1** | Right Click (SW2) | Kailh Silent Micro Switch (6x6x7.3mm)[cite: 3] | Direct GPIO (Active Low) |
-| **D2** | Middle Click (SW3) | 4.5x4.5x4.3mm Tactile Switch[cite: 2] | Direct GPIO (Active Low) |
-| **D3** | Side Button (SW4) | 4.5x4.5x5.0mm Tactile Switch[cite: 5] | Direct GPIO (Active Low) |
-| **D4** | Mode Button (SW5) | 4.5x4.5x4.3mm Tactile Switch[cite: 2] | Direct GPIO (Active Low) |
+| **D0** | Left Click (SW1) | Kailh Silent Micro Switch (6x6x7.3mm) | Direct GPIO (Active Low) |
+| **D1** | Right Click (SW2) | Kailh Silent Micro Switch (6x6x7.3mm) | Direct GPIO (Active Low) |
+| **D2** | Middle Click (SW3) | Short Tactile Switch (4.5x4.5x4.3mm, TS-4501) | Direct GPIO (Active Low) |
+| **D3** | Side Button (SW4) | Kailh Silent Micro Switch (6x6x7.3mm) | Direct GPIO (Active Low) |
+| **D4** | Mode Button (SW5) | Tall Tactile Switch (4.5x4.5x5.0mm, TS-4501) | Direct GPIO (Active Low) |
 | **D5** | Encoder Phase A | TTC Green Core Rotary Encoder | `alps,ec11` |
 | **D6** | Encoder Phase B | TTC Green Core Rotary Encoder | `alps,ec11` |
 | **D7** | SPI CS | PAW3395 Chip Select | SPI2 (`nordic,nrf-spim`) |
@@ -48,31 +46,19 @@ The physical design and transparent aesthetic of this project were inspired by t
 
 ## 📦 Key Hardware Components (BOM Highlights)
 
-### Acctive Components & Sensors
+### Active Components & Sensors
 - **Sensor**: PixArt PAW3395 (1000 CPI native configuration)
 - **Power LDO (U3)**: Texas Instruments TLV74318PDBVR (1.8V Low-Dropout Regulator, SOT-23-5)[cite: 1]
-- **Switches (L / R / Side)**: Kailh Silent Micro Switch (6x6x7.3mm, 2-pin) × 3[cite: 3]
-- **Middle Click Switch**: Short Tactile Switch (4.5x4.5x4.3mm, TS-4501)[cite: 2]
-- **Mode Switch**: Tall Tactile Switch (4.5x4.5x5.0mm, TS-4501)[cite: 5]
-- **Power Switch**: Subminiature Slide Switch (MSK12C01 series)[cite: 2]
+- **Switches (L / R / Side)**: Kailh Silent Micro Switch (6x6x7.3mm, 2-pin) × 3
+- **Middle Click Switch**: Short Tactile Switch (4.5x4.5x4.3mm, TS-4501)
+- **Mode Switch**: Tall Tactile Switch (4.5x4.5x5.0mm, TS-4501)
+- **Power Switch**: Subminiature Slide Switch (MSK12C01 series)
 - **Encoder**: TTC Green Core Mechanical Rotary Encoder (12 Pulses / 24 Detents)
-- **Battery**: 3.7V 200mAh 601230 Rechargeable Li-Po Battery[cite: 4]
-- **MCU Header**: MAC8 Conthrough / Spring Pin Header (12-Pin, Height: 3.5mm)[cite: 6]
+- **Battery**: 3.7V 200mAh 601230 Rechargeable Li-Po Battery
 
 ### Recommended Passives (0805 SMD)
 - **Resistors**: 10kΩ ±1% (R1), 4.7Ω ±1% (R2), 2MΩ ±1% (R3)[cite: 1]
 - **Capacitors**: 100nF 50V X7R (C2, C4, C5), 10µF 35V X5R (C3, C6), 47µF 10V X5R (C8), 1µF 50V X7R (C9, C11), 4.7µF 50V X5R (C1)[cite: 1]
-
----
-
-## ⚠️ Hardware Assembly Notes
-
-### MCU Mounting (Conthrough / Spring Pin Header)
-- **Footprint Requirement**: The mainboard uses specific footprints optimized for **MAC8 Conthrough 3.5mm spring pins** (smaller hole diameter compared to standard 2.54mm pin headers)[cite: 6]. Standard pin headers may not fit or establish reliable contact.
-- **Assembly Workflow**:
-  1. Insert the XIAO BLE module into the mainboard using the 3.5mm Conthrough header without soldering[cite: 6].
-  2. Flash the firmware and perform complete hardware/sensor operational checks.
-  3. Once verified, permanently solder the pins to ensure mechanical stability against drops and long-term switch actuation force.
 
 ---
 
@@ -81,10 +67,10 @@ The physical design and transparent aesthetic of this project were inspired by t
 ### 1. Direct Integer Wheel Scroll (`zmk,behavior-encoder-mouse-scroll`)
 - **Profile**: Configured for 12 pulses / 24 detents matching the TTC Green Core hardware spec (`steps = <12>; triggers-per-rotation = <24>;`).
 - **Low-Latency Logic**: Direct integer HID report dispatch (`±1` per physical notch), eliminating latency and notch misreads caused by floating-point software inertia layers.
-- **Reference**: The direct scroll implementation references the approach from **elekit's (`elek1t`) encoder scroll behavior**, adapted and ported for ZMK v0.3 compatibility.
+- **Reference**: Ported and adapted from **elekit's (`elek1t`) encoder scroll behavior** for ZMK v0.3 compatibility.
 
 ### 2. Sensor & Motion Processing (PAW3395 Driver)
-- **Driver**: Powered by and adapted from **[badjeff/zmk-paw3395-driver](https://github.com/badjeff/zmk-paw3395-driver)**[cite: 7].
+- **Driver**: Powered by and adapted from **[badjeff/zmk-paw3395-driver](https://github.com/badjeff/zmk-paw3395-driver)**.
 - **Clock**: SPI2 running at 4 MHz (`CONFIG_SPI=y`, `CONFIG_INPUT=y`, `CONFIG_PAW3395=y`).
 - **Interrupt Routing**: Routed through NFC1 pin (`P0.09`) using `CONFIG_NFCT_PINS_AS_GPIOS=y`.
 - **Drag Scroll (Layer 2)**: Re-routes sensor XY delta coordinates to horizontal/vertical scroll events (`zip_xy_to_scroll_mapper`) with axis inversion for rapid omnidirectional navigation.
@@ -103,6 +89,8 @@ The physical design and transparent aesthetic of this project were inspired by t
 
 ## 🖱 Keymap & Operation Layer Guide
 
+> ℹ️ **Note**: This keymap layout is tailored specifically for personal office and document workflows on a Windows PC. It can be freely customized or remapped to suit your preferences using standard ZMK keymap behaviors.
+
 ### Layer 0: Default
 - **LCLK / RCLK / MCLK**: Standard mouse buttons
 - **LCLK + RCLK (Combo)**: Windows Copy (`Ctrl + C`)
@@ -116,9 +104,9 @@ The physical design and transparent aesthetic of this project were inspired by t
 - **Wheel**: Horizontal scroll (`SCRL_LEFT` / `SCRL_RIGHT`)
 - **LCLK**: Navigate Forward (`MB5`)
 - **MCLK**: Task View (`Win + Tab`)
-- **RCLK (Tap)**: Standard Right Click (`RCLK`)
+- **RCLK (Tap)**: Windows Paste (`Ctrl + V`)
 - **RCLK (Hold)**: Momentary switch to **Layer 2 (System & BT)**
-- **LCLK + RCLK (Combo)**: Windows Paste (`Ctrl + V`)
+- **LCLK + RCLK (Combo)**: Snipping Tool (`Win + Shift + S`) via dedicated macro
 - **Mode Button (SW5)**: Enter DFU Bootloader mode (`&bootloader`)
 
 ### Layer 2: BT & System Management (Hold Side + Hold Right Click)
@@ -134,13 +122,13 @@ The physical design and transparent aesthetic of this project were inspired by t
 2. Ensure `config/` matches your board layout.
 3. Push to `main` branch to trigger automated GitHub Actions build.
 4. Download the generated `zmk.uf2` firmware artifact.
-5. Put the XIAO BLE into bootloader mode and drop the `.uf2` file.
+5. Put the XIAO BLE into bootloader mode and drag-and-drop the `.uf2` file.
 
 ---
 
 ## 🙏 Acknowledgments & Credits
 
-- **[badjeff/zmk-paw3395-driver](https://github.com/badjeff/zmk-paw3395-driver)**: The core PAW3395 optical sensor driver implementation for ZMK[cite: 7].
+- **[badjeff/zmk-paw3395-driver](https://github.com/badjeff/zmk-paw3395-driver)**: The core PAW3395 optical sensor driver implementation for ZMK.
 - **[elek1t](https://github.com/elek1t)**: Reference implementation for the direct 1:1 integer encoder scrolling behavior.
 - **[zmk-rgbled-widget](https://github.com/caksoylar/zmk-rgbled-widget)**: On-board RGB LED battery and Bluetooth status indicator widget by caksoylar.
 - **[ZMK Firmware](https://github.com/zmkfirmware/zmk)**: The underlying open-source keyboard and pointing device firmware project.
