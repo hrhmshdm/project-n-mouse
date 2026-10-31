@@ -86,6 +86,22 @@
 
         // Direct 1-pulse to 1-report integer wheel scroll behavior (ported for ZMK v0.3)
         // 1ノッチ＝1ダイレクト送信の低遅延スクロール動作（v0.3移植版）
+        /*
+         * =====================================================================
+         * [Custom Behavior] 1:1 Direct Integer Wheel Scroll (ec_ms)
+         * ---------------------------------------------------------------------
+         * [What it is / 概要]:
+         *   Custom encoder behavior ported from elekit's (elek1t) scroll logic
+         *   to maintain compatibility with ZMK v0.3.
+         *   ZMK標準の慣性スクロール（小数レポート・加速）を通さず、ハードウェアの
+         *   1クリック（1ノッチ）に対して HID レポート「±1」を即時・ダイレクトに
+         *   送信する低遅延スクロール動作。
+         *
+         * [Why it's needed / 理由]:
+         *   ZMK標準のマウススクロールではホイールの1目盛り回転に対して入力が遅れたり、
+         *   中途半端なスクロール量で空振りする現象を防ぐため。
+         * =====================================================================
+         */
         ec_ms: encoder_mouse_scroll {
             compatible = "zmk,behavior-encoder-mouse-scroll";
             #sensor-binding-cells = <2>;
