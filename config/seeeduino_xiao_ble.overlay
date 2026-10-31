@@ -4,7 +4,10 @@
 #include <dt-bindings/zmk/input_transform.h>
 
 / {
-    /* XIAO内蔵の3色LED（led0〜2）を zmk-rgbled-widget 用の名前に紐付ける */
+    /* 
+     * Map XIAO on-board RGB LEDs (led0-2) for zmk-rgbled-widget
+     * XIAO内蔵の3色LED（led0〜2）を zmk-rgbled-widget 用の名前に紐付け
+     */
     aliases {
         led-red = &led0;
         led-green = &led1;
@@ -15,39 +18,52 @@
         zmk,kscan = &kscan0;
     };
 
-    /* 5つのボタン設定 (D0〜D4) */
+    /* 
+     * 5 Direct GPIO Button Configuration (D0 - D4)
+     * 5つのボタン設定 (D0〜D4)
+     */
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-direct";
         wakeup-source;
         input-gpios
-            = <&xiao_d 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW1: 左クリック */
-            , <&xiao_d 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW2: 右クリック */
-            , <&xiao_d 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW3: 中クリック */
-            , <&xiao_d 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW4: サイドボタン */
-            , <&xiao_d 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW5: モードボタン */
+            = <&xiao_d 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW1: Left Click (Kailh Silent) / 左クリック */
+            , <&xiao_d 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW2: Right Click (Kailh Silent) / 右クリック */
+            , <&xiao_d 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW3: Middle Click (Short Tactile H=4.3mm) / 中クリック */
+            , <&xiao_d 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW4: Side Button (Kailh Silent) / サイドボタン */
+            , <&xiao_d 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* SW5: Mode Button (Tall Tactile H=5.0mm) / モードボタン */
             ;
     };
 
-    /* TTC グリーンコア エンコーダ設定 (図面仕様: 12パルス / 24デテント) */
+    /* 
+     * TTC Green Core Mechanical Rotary Encoder (12 Pulses / 24 Detents)
+     * TTC グリーンコア エンコーダ設定 (仕様: 12パルス / 24デテント)
+     */
     left_encoder: encoder_left {
         compatible = "alps,ec11";
         a-gpios = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&xiao_d 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <12>; /* ★12パルス指定（24デテントとの組み合わせで1ノッチ＝1発火に一致） */
+        steps = <12>; /* 12 pulses per rotation / 12パルス指定（1ノッチ＝1発火に一致） */
         status = "okay";
     };
 
     sensors: sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&left_encoder>;
-        triggers-per-rotation = <24>; /* ★24デテント指定 */
+        triggers-per-rotation = <24>; /* 24 physical detents / 24デテント指定 */
     };
 
+    /* 
+     * Sensor Input Listener (Drag Scroll Mapper on Layer 2)
+     * PAW3395 入力リスナー設定（レイヤー2でのセンサースクロール変換）
+     */
     paw3395_listener {
         compatible = "zmk,input-listener";
         device = <&pd0>;
 
-        /* レイヤー2（サイド＋右クリック中）：上下左右すべて自由に動く超高速スクロール */
+        /* 
+         * Layer 2 (Side + Hold Right Click): Omnidirectional drag scroll
+         * レイヤー2（サイド＋右クリック中）：上下左右すべて自由に動く高速スクロール
+         */
         drag_scroll_fast {
             layers = <2>;
             input-processors = <&zip_xy_scaler 1 1>, <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>, <&zip_xy_to_scroll_mapper>;
@@ -55,10 +71,15 @@
     };
 };
 
+/* Disable unused I2C0 / 未使用のI2C0を無効化 */
 &i2c0 {
     status = "disabled";
 };
 
+/* 
+ * Hardware SPI2 Bus Configuration for PixArt PAW3395 Optical Sensor
+ * PAW3395 光学センサー用 ハードウェアSPI2通信設定
+ */
 &spi2 {
     compatible = "nordic,nrf-spim";
     status = "okay";
@@ -70,7 +91,7 @@
         label = "MOU0";
         reg = <0>;
         spi-max-frequency = <4000000>;
-        irq-gpios = <&gpio0 9 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        irq-gpios = <&gpio0 9 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; /* P0.09 (NFC1 pin) as motion interrupt */
         cpi = <1000>;
         evt-type = <INPUT_EV_REL>;
         x-input-code = <INPUT_REL_X>;
