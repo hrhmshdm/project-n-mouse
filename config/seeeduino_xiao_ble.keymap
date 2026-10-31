@@ -4,10 +4,13 @@
 #include <dt-bindings/zmk/pointing.h>
 
 / {
-    // 同時押し（コンボ）の定義
+    // ==========================================================
+    // Combos (Simultaneous Key Press) / 同時押しコンボ設定
+    // ==========================================================
     combos {
         compatible = "zmk,combos";
 
+        // Layer 0: Left Click + Right Click = Copy (Ctrl + C)
         // レイヤー0：左クリック ＋ 右クリック ＝ コピー (Ctrl + C)
         combo_copy {
             timeout-ms = <50>;
@@ -16,6 +19,7 @@
             layers = <0>;
         };
 
+        // Layer 1: Left Click + Right Click (while holding Side) = Paste (Ctrl + V)
         // レイヤー1：サイド長押し中 ＋ 左クリック ＋ 右クリック ＝ ペースト (Ctrl + V)
         combo_paste {
             timeout-ms = <50>;
@@ -25,13 +29,20 @@
         };
     };
 
+    // ==========================================================
+    // Macros / マクロ定義
+    // ==========================================================
     macros {
+        // Next Bluetooth profile macro
+        // 次のBluetoothプロファイルへ切り替え
         bt_nxt_m: bt_nxt_macro {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
             bindings = <&bt BT_NXT>;
         };
 
+        // Clear current Bluetooth profile macro
+        // 現在のBluetoothプロファイルのペアリング解除
         bt_clr_m: bt_clr_macro {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
@@ -39,8 +50,12 @@
         };
     };
 
+    // ==========================================================
+    // Custom Behaviors / カスタム動作定義
+    // ==========================================================
     behaviors {
-        // SW4用：単押しで「戻る(MB4)」、長押し中はレイヤー1へ
+        // SW4 (Side): Tap for MB4 (Back), Hold for Layer 1
+        // SW4（サイド）：単押しで「戻る(MB4)」、長押し中はレイヤー1へ移行
         lt_mkp: layer_tap_mouse_kp {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
@@ -49,7 +64,8 @@
             bindings = <&mo>, <&mkp>;
         };
 
-        // レイア1内：右クリック（RCLK）長押しでレイヤー2（高速スクロール）へ
+        // In Layer 1: Tap for RCLK, Hold for Layer 2 (Fast scroll & BT select)
+        // レイヤー1内：右クリック単押しで「RCLK」、長押しでレイヤー2へ移行
         lt_rclk_layer2: layer_tap_rclk_layer2 {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
@@ -58,7 +74,8 @@
             bindings = <&mo>, <&mkp>;
         };
 
-        // SW5用：短押しで次の接続先へ、2秒長押しでペアリング解除
+        // SW5 (Mode): Tap for Next BT Profile, Hold (2 sec) to Clear Profile
+        // SW5（モード）：短押しで次の接続先へ、2秒長押しでペアリング解除
         bt_mode: bt_mode_hold_tap {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
@@ -67,48 +84,60 @@
             bindings = <&bt_clr_m>, <&bt_nxt_m>;
         };
 
-        // v0.3移植版の1ノッチ＝1ダイレクト送信スクロール
+        // Direct 1-pulse to 1-report integer wheel scroll behavior (ported for ZMK v0.3)
+        // 1ノッチ＝1ダイレクト送信の低遅延スクロール動作（v0.3移植版）
         ec_ms: encoder_mouse_scroll {
             compatible = "zmk,behavior-encoder-mouse-scroll";
             #sensor-binding-cells = <2>;
         };
     };
 
+    // ==========================================================
+    // Keymap Layers / キーマップ定義
+    // ==========================================================
     keymap {
         compatible = "zmk,keymap";
 
-        // レイヤー0：通常モード（縦スクロール ＆ 左右同時でコピー ＆ モード＋左右でBT切替）
+        // Layer 0: Default / 通常モード
+        // - Vertical scroll
+        // - LCLK + RCLK: Copy (Ctrl + C)
+        // - Mode tap: Next BT / Mode hold (2s): Clear BT
         default_layer {
             bindings = <
-                &mkp LCLK       // 0: 左クリック
-                &mkp RCLK       // 1: 右クリック
-                &mkp MCLK       // 2: 中クリック
-                &lt_mkp 1 MB4   // 3: サイド（単押し:戻る / 長押し:レイヤー1へ）
-                &bt_mode 0 0    // 4: モード（短押し:次へ / 2秒長押し:ペアリング解除）
+                &mkp LCLK       // 0: Left Click / 左クリック
+                &mkp RCLK       // 1: Right Click / 右クリック
+                &mkp MCLK       // 2: Middle Click / 中クリック
+                &lt_mkp 1 MB4   // 3: Side Switch (Tap: Back MB4 / Hold: Layer 1)
+                &bt_mode 0 0    // 4: Mode Switch (Tap: Next BT / Hold 2s: Clear BT)
             >;
             sensor-bindings = <&ec_ms SCRL_UP SCRL_DOWN>;
         };
 
-        // レイヤー1：サイドボタン長押し中（横スクロール ＆ 右長押しでレイヤー2へ ＆ 左右同時でペースト）
+        // Layer 1: Navigation Layer / ナビゲーションレイヤー（サイドボタン長押し中）
+        // - Horizontal scroll
+        // - LCLK + RCLK: Paste (Ctrl + V)
+        // - Hold RCLK: Transition to Layer 2
+        // - Mode button: Enter bootloader
         scroll_layer {
             bindings = <
-                &mkp MB5         // サイド＋左クリック：進む(MB5)
-                &lt_rclk_layer2 2 RCLK   // 右クリック（単押し:右クリック / 長押し:レイヤー2へ）
-                &kp LG(TAB)      // サイド＋中クリック：Win + Tab
-                &trans                   // サイド自身
-                &bootloader              // SW5: ファームウェア書込モード
+                &mkp MB5                 // 0: Side + LCLK: Forward (MB5) / 進む
+                &lt_rclk_layer2 2 RCLK   // 1: Side + RCLK (Tap: RCLK / Hold: Layer 2)
+                &kp LG(TAB)              // 2: Side + MCLK: Task View (Win + Tab)
+                &trans                   // 3: Side Button (Transparent)
+                &bootloader              // 4: Mode Button: DFU Bootloader Mode / 書込モード
             >;
             sensor-bindings = <&ec_ms SCRL_LEFT SCRL_RIGHT>;
         };
 
-        // レイヤー2：サイド ＋ 右クリック長押し中（自由＆高速スクロール）
+        // Layer 2: System & Profile Layer / システム・BT切替レイヤー（サイド ＋ 右クリック長押し中）
+        // - Fast navigation & direct BT profile switching
         fast_scroll_layer {
             bindings = <
-                &bt BT_SEL 0     // サイド＋右＋左クリック：プロファイル0（Win）へ切替
-                &trans
-                &bt BT_SEL 1     // サイド＋右＋中クリック：プロファイル1（Mac）へ切替
-                &trans
-                &trans
+                &bt BT_SEL 0     // 0: Side + RCLK + LCLK: Select Profile 0 (Win)
+                &trans           // 1: Transparent
+                &bt BT_SEL 1     // 2: Side + RCLK + MCLK: Select Profile 1 (Mac)
+                &trans           // 3: Transparent
+                &trans           // 4: Transparent
             >;
             sensor-bindings = <&ec_ms SCRL_UP SCRL_DOWN>;
         };
