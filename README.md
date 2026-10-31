@@ -107,20 +107,24 @@ The physical design and transparent aesthetic of this project were inspired by t
 - **LCLK / RCLK / MCLK**: Standard mouse buttons
 - **LCLK + RCLK (Combo)**: Windows Copy (`Ctrl + C`)
 - **Side Button (Tap)**: Navigate Back (`MB4`)
-- **Side Button (Hold)**: Switch to **Layer 1**
-- **Mode Button (Tap)**: Next Bluetooth profile (`BT_NXT`)
-- **Mode Button (Hold)**: Switch to **Layer 2** (Bluetooth management)
-- **Wheel**: Vertical scroll
+- **Side Button (Hold)**: Momentary switch to **Layer 1**
+- **Mode Button (SW5 - Tap)**: Switch to next Bluetooth profile (`BT_NXT`)
+- **Mode Button (SW5 - Hold 2s)**: Clear pairing for current profile (`BT_CLR`)
+- **Wheel**: Vertical scroll (1:1 direct integer notch)
 
 ### Layer 1: Navigation Layer (Hold Side Button)
 - **Wheel**: Horizontal scroll (`SCRL_LEFT` / `SCRL_RIGHT`)
+- **LCLK**: Navigate Forward (`MB5`)
+- **MCLK**: Task View (`Win + Tab`)
+- **RCLK (Tap)**: Standard Right Click (`RCLK`)
+- **RCLK (Hold)**: Momentary switch to **Layer 2 (System & BT)**
 - **LCLK + RCLK (Combo)**: Windows Paste (`Ctrl + V`)
-- **Mode Button**: Bootloader mode (`&bootloader`)
+- **Mode Button (SW5)**: Enter DFU Bootloader mode (`&bootloader`)
 
-### Layer 2: BT & System Management (Hold Mode Button)
+### Layer 2: BT & System Management (Hold Side + Hold Right Click)
 - **Left Click**: Select Profile 0 (`&bt BT_SEL 0`)
-- **Right Click**: Select Profile 1 (`&bt BT_SEL 1`)
-- **Middle Click**: Clear pairing for current profile (`&bt BT_CLR`)
+- **Middle Click**: Select Profile 1 (`&bt BT_SEL 1`)
+- **Sensor Motion**: Omnidirectional high-speed drag scroll
 
 ---
 
