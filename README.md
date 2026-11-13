@@ -10,9 +10,9 @@ Designed around the **Seeed Studio XIAO nRF52840 (BLE)**, featuring a **PixArt P
 
 ## 🎥 Overview & Demo Video
 
-Check out the project overview, click sound test, and tracking demo on YouTube:
+Check out the project overview and tracking demo on YouTube:
 
-👉 **[Project N-Mouse — Overview & Sound/Tracking Demo (YouTube)](https://www.youtube.com/watch?v=XOwZDo6zqsA)**
+👉 **[Project N-Mouse — Overview & Tracking Demo (YouTube)](https://www.youtube.com/watch?v=XOwZDo6zqsA)**
 
 ---
 
