@@ -8,6 +8,14 @@ Designed around the **Seeed Studio XIAO nRF52840 (BLE)**, featuring a **PixArt P
 
 ---
 
+## 🎥 Overview & Demo Video
+
+Check out the project overview, click sound test, and tracking demo on YouTube:
+
+👉 **[Project N-Mouse — Overview & Sound/Tracking Demo (YouTube)](https://www.youtube.com/watch?v=XOwZDo6zqsA)**
+
+---
+
 ## 💡 Concept & Design Inspiration
 
 The physical design and transparent aesthetic of this project were inspired by the charging case of **Nothing Ear**. It aims to bring that minimalist, transparent industrial design language into an open-source, ultra-compact wireless mouse.
