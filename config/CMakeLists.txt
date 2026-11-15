@@ -1,1 +1,1 @@
-target_sources(app PRIVATE src/behavior_encoder_mouse_scroll.c)
+# ZMK v0.4 uses elekit-official/zmk_encoder module
