@@ -2,6 +2,7 @@
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 #include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
+#include <zephyr/dt-bindings/regulator/nrf5x.h>
 
 / {
     /* 
@@ -86,6 +87,11 @@
             input-processors = <&zip_xy_scaler 1 1>, <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>, <&zip_xy_to_scroll_mapper>;
         };
     };
+};
+
+/* Enable internal DC/DC converter (ZMK v0.4 / Zephyr 4.1) */
+&reg1 {
+    regulator-initial-mode = <NRF5X_REG_MODE_DCDC>;
 };
 
 /* Disable unused I2C0 / 未使用のI2C0を無効化 */
