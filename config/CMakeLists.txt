@@ -1,1 +1,1 @@
-# ZMK v0.4 native pointing behaviors
+target_sources(app PRIVATE src/behavior_encoder_mouse_scroll.c)
